@@ -67,67 +67,129 @@ def check_dict(string: str):
         return True
     except:
         return False
-    
 
-def create_user_parameters_dic(user_values_dic):
-    user_parameters_dic= {
-            "common": {
-                "acquisition": {
-                    "DAPI_channel": user_values_dic['dapi_ch'],
-                    "RNA_channel": user_values_dic['rna_ch'],
-                    "barcode_channel": user_values_dic['barcode_ch'],
-                    "mask_channel": user_values_dic['mask_ch'],
-                    "fiducialBarcode_channel": user_values_dic['barcodeFid_ch'],
-                    "fiducialMask_channel": user_values_dic['maskFid_ch'],
-                    "fiducialDAPI_channel": user_values_dic['dapiFid_ch'],
-                    "pixelSizeXY": float(user_values_dic['pixelSizeXY_Entry']),
-                    "pixelSizeZ": float(user_values_dic['pixelSizeZ_Entry'])
-                },
-                "alignImages": {
-                    "blockSize": int(user_values_dic['blockSize_Entry']),
-                    "referenceFiducial": user_values_dic['referenceFiducial_Entry']
-                },
-                "buildsPWDmatrix": {
-                    "tracing_method": user_values_dic['tracing_method_Entry'].replace(' ','').split(","),
-                    "mask_expansion": int(user_values_dic['mask_expansion_Entry']),
-                    "flux_min": int(user_values_dic['flux_min_Entry']),
-                    "flux_min_3D": int(user_values_dic['flux_min_3D_Entry']),
-                    "KDtree_distance_threshold_mum": int(user_values_dic['KDtree_distance_threshold_mum_Entry']),
-                    "folder": str(user_values_dic['folder_Entry']),
-                    "masks2process": convert_string_to_dictionnary(user_values_dic['masks2process_Entry']),
-                    "toleranceDrift": int(user_values_dic['toleranceDrift_Entry'])
-                },
-                "segmentedObjects": {
-                    "stardist_basename": str(user_values_dic['stardist_Entry']),
-                    "brightest": check_brightest(user_values_dic['brightest_Entry'])
-                }
-            },
-            "labels": {
-                "DAPI": {
-                    "segmentedObjects": {
-                        "area_max": int(user_values_dic['aeraMaxSegObjt_Entry']),
-                        "area_min": int(user_values_dic['aeraMinSegObjt_Entry'])
-                    },
-                    "zProject": {
-                        "zmax": int(user_values_dic['zProject_Dapi_zmax_Entry']),
-                        "zmin": int(user_values_dic['zProject_Dapi_zmin_Entry'])
-                    }
-                },
-                "barcode": {
-                    "zProject": {
-                        "zmax": int(user_values_dic['zmaxZProjct_Bcd_Entry']),
-                        "zmin": int(user_values_dic['zminZProjct_Bcd_Entry'])
-                    }
-                },
-                "mask": {
-                    "zProject": {
-                        "zmax": int(user_values_dic['zmaxZProjct_Mask_Entry']),
-                        "zmin": int(user_values_dic['zminZProjct_Mask_Entry'])
-                    }
-                }
-            }
-        }
-    return user_parameters_dic
+
+def update_infoList(user_values_dic):
+    dic_comm_acqui ={
+        "DAPI_channel": user_values_dic['dapi_ch'],
+        "RNA_channel": user_values_dic['rna_ch'],
+        "barcode_channel": user_values_dic['barcode_ch'],
+        "mask_channel": user_values_dic['mask_ch'],
+        "fiducialBarcode_channel": user_values_dic['barcodeFid_ch'],
+        "fiducialMask_channel": user_values_dic['maskFid_ch'],
+        "fiducialDAPI_channel": user_values_dic['dapiFid_ch'],
+        "pixelSizeXY": float(user_values_dic['pixelSizeXY_Entry']),
+        "pixelSizeZ": float(user_values_dic['pixelSizeZ_Entry'])
+    }
+    dic_comm_aligimg = {
+        "blockSize": int(user_values_dic['blockSize_Entry']),
+        "referenceFiducial": user_values_dic['referenceFiducial_Entry']
+    }
+    dic_comm_buildmatrix = {
+        "tracing_method": user_values_dic['tracing_method_Entry'].replace(' ','').split(","),
+        "mask_expansion": int(user_values_dic['mask_expansion_Entry']),
+        "flux_min": int(user_values_dic['flux_min_Entry']),
+        "flux_min_3D": int(user_values_dic['flux_min_3D_Entry']),
+        "KDtree_distance_threshold_mum": int(user_values_dic['KDtree_distance_threshold_mum_Entry']),
+        "folder": str(user_values_dic['folder_Entry']),
+        "masks2process": convert_string_to_dictionnary(user_values_dic['masks2process_Entry']),
+        "toleranceDrift": int(user_values_dic['toleranceDrift_Entry'])
+    }
+    dic_comm_segmObj = {
+        "stardist_basename": str(user_values_dic['stardist_Entry']),
+        "brightest": check_brightest(user_values_dic['brightest_Entry'])
+    }
+    dic_labels_dapi_segmObj = {
+        "area_max": int(user_values_dic['aeraMax_dapi_SegOblt_Entry']),
+        "area_min": int(user_values_dic['aeraMin_dapi_SegOblt_Entry'])
+    }
+    
+   
+    dic_labels_dapi_zpro = {
+        "zmax": int(user_values_dic['zProject_Dapi_zmax_Entry']),
+        "zmin": int(user_values_dic['zProject_Dapi_zmin_Entry'])
+    }
+    dic_labels_bcd_zpro = {
+        "zmax": int(user_values_dic['zProject_Bcd_zmax_Entry']),
+        "zmin": int(user_values_dic['zProject_Bcd_zmin_Entry'])
+    }
+    
+    dic_labels_mask_zpro = {
+         "zmax": int(user_values_dic['zProject_Mask_zmax_Entry']),
+         "zmin": int(user_values_dic['zProject_Mask_zmin_Entry'])
+     }
+    with open("./infoList.json", mode='r') as file:
+        infoList = json.load(file)
+    infoList["common"]["acquisition"].update(dic_comm_acqui)
+    infoList["common"]["alignImages"].update(dic_comm_aligimg)
+    infoList["common"]["buildsPWDmatrix"].update(dic_comm_buildmatrix)
+    infoList["common"]["segmentedObjects"].update(dic_comm_segmObj)
+    infoList["labels"]["DAPI"]["segmentedObjects"].update(dic_labels_dapi_segmObj)
+    infoList["labels"]["DAPI"]["zProject"].update(dic_labels_dapi_zpro)
+    infoList["labels"]["barcode"]["zProject"].update(dic_labels_bcd_zpro)
+    infoList["labels"]["mask"]["zProject"].update(dic_labels_mask_zpro)
+    with open("./infoList_user.json", mode='w') as file:
+        json.dump(infoList, file, indent=4)
+
+# def create_user_parameters_dic(user_values_dic):
+#     user_parameters_dic= {
+#             "common": {
+#                 "acquisition": {
+#                     "DAPI_channel": user_values_dic['dapi_ch'],
+#                     "RNA_channel": user_values_dic['rna_ch'],
+#                     "barcode_channel": user_values_dic['barcode_ch'],
+#                     "mask_channel": user_values_dic['mask_ch'],
+#                     "fiducialBarcode_channel": user_values_dic['barcodeFid_ch'],
+#                     "fiducialMask_channel": user_values_dic['maskFid_ch'],
+#                     "fiducialDAPI_channel": user_values_dic['dapiFid_ch'],
+#                     "pixelSizeXY": float(user_values_dic['pixelSizeXY_Entry']),
+#                     "pixelSizeZ": float(user_values_dic['pixelSizeZ_Entry'])
+#                 },
+#                 "alignImages": {
+#                     "blockSize": int(user_values_dic['blockSize_Entry']),
+#                     "referenceFiducial": user_values_dic['referenceFiducial_Entry']
+#                 },
+#                 "buildsPWDmatrix": {
+#                     "tracing_method": user_values_dic['tracing_method_Entry'].replace(' ','').split(","),
+#                     "mask_expansion": int(user_values_dic['mask_expansion_Entry']),
+#                     "flux_min": int(user_values_dic['flux_min_Entry']),
+#                     "flux_min_3D": int(user_values_dic['flux_min_3D_Entry']),
+#                     "KDtree_distance_threshold_mum": int(user_values_dic['KDtree_distance_threshold_mum_Entry']),
+#                     "folder": str(user_values_dic['folder_Entry']),
+#                     "masks2process": convert_string_to_dictionnary(user_values_dic['masks2process_Entry']),
+#                     "toleranceDrift": int(user_values_dic['toleranceDrift_Entry'])
+#                 },
+#                 "segmentedObjects": {
+#                     "stardist_basename": str(user_values_dic['stardist_Entry']),
+#                     "brightest": check_brightest(user_values_dic['brightest_Entry'])
+#                 }
+#             },
+#             "labels": {
+#                 "DAPI": {
+#                     "segmentedObjects": {
+#                         "area_max": int(user_values_dic['aeraMax_dapi_SegOblt_Entry']),
+#                         "area_min": int(user_values_dic['aeraMin_dapi_SegOblt_Entry'])
+#                     },
+#                     "zProject": {
+#                         "zmax": int(user_values_dic['zProject_Dapi_zmax_Entry']),
+#                         "zmin": int(user_values_dic['zProject_Dapi_zmin_Entry'])
+#                     }
+#                 },
+#                 "barcode": {
+#                     "zProject": {
+#                         "zmax": int(user_values_dic['zProject_Bcd_zmax_Entry']),
+#                         "zmin": int(user_values_dic['zProject_Bcd_zmin_Entry'])
+#                     }
+#                 },
+#                 "mask": {
+#                     "zProject": {
+#                         "zmax": int(user_values_dic['zProject_Mask_zmax_Entry']),
+#                         "zmin": int(user_values_dic['zProject_Mask_zmin_Entry'])
+#                     }
+#                 }
+#             }
+#         }
+#     return user_parameters_dic
 
 def check_settings(entries_dic):
     """Return True if all parameters have good type expected, else return False with a pop-up error window"""

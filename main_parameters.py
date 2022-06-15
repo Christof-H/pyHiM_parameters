@@ -1,19 +1,19 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import END
 from functools import partial
 from info_parameters import *
 from function_parameters import *
-
+from tkinter import messagebox
+import os
 import json
-
-
-main_window = tk.Tk()
-main_window.title("pyHiM parameters")
-main_window.minsize(width=1000, height=700)
-
 
 entries_dic = {}
 user_values_dic = {}
+
+main_window = tk.Tk()
+main_window.title("pyHiM parameters")
+main_window.minsize(width=1000, height=480)
 
 # ---------------------------------------------Functions------------------------------------------------
 
@@ -44,9 +44,13 @@ def save_setting(entries_dic, user_values_dic):
         for key, list_values in entries_dic.items():
             entered_value = list_values[0].get()
             user_values_dic[key] = entered_value
-        User_parameters_dic = create_user_parameters_dic(user_values_dic)
-        with open("./infoList_user.json", mode='w') as file:
-            json.dump(User_parameters_dic, file, indent=4)
+        update_infoList(user_values_dic)
+        # user_parameters_dic = create_user_parameters_dic(user_values_dic)
+        # with open("./infoList.json", mode='r') as file:
+        #     infoList = json.load(file)
+        #     infoList.update(user_parameters_dic)
+        # with open("./infoList_user.json", mode='w') as file:
+        #     json.dump(infoList, file, indent=4)
         messagebox.showinfo("Info Message", "The settings have been saved.")
 
 
@@ -60,30 +64,50 @@ restore_button.grid(row=27, column=0, columnspan=3, pady=5, padx=5)
 save_button = tk.Button(main_window, text='Save settings', command=partial(save_setting, entries_dic, user_values_dic))
 save_button.grid(row=27, column=2, columnspan=3, pady=5, padx=5)
 
-# -------------------------Label Frame--------------------------------
-# label frame (box) for Acquisition parameters
-acquisition_labelFrame = tk.LabelFrame(main_window, text="1. Acquisition parameters")
-acquisition_labelFrame.grid(row=0, column=0, columnspan=6, pady=5, padx=5)
 
+# --------------------------------------------Tab creation----------------------------------------------------
+notebook = ttk.Notebook(main_window)
+notebook.grid(row=0, column=0, rowspan=11, columnspan=5, pady=10)
+
+tab1 = ttk.Frame(notebook, width=700, height=700)
+tab1.grid(row=0, column=0, rowspan=10, columnspan=5)
+
+tab2 = ttk.Frame(notebook, width=700, height=700)
+tab2.grid(row=0, column=0, rowspan=10, columnspan=5)
+
+notebook.add(tab1, text='Standard Settings')
+notebook.add(tab2, text='Expert Settings')
+
+
+
+# -------------------------Label Frame--------------------------------
 # label frame (box) for quick help box
 help_LabelFrame = tk.LabelFrame(main_window, text="Quick Help")
-help_LabelFrame.grid(row=0, column=7, pady=5, padx=5)
+help_LabelFrame.grid(row=0, column=6, pady=5, padx=5)
 
-# label frame (box) for AlignImages parameters
-alignImages_LabelFrame = tk.LabelFrame(main_window, text="2. AlignImages parameters")
-alignImages_LabelFrame.grid(row=9, column=0, columnspan=6, pady=5, padx=5, sticky='WE')
+# label frame (box) for Acquisition parameters (tab1)
+acquisition_labelFrame = tk.LabelFrame(tab1, text="1. Acquisition parameters")
+acquisition_labelFrame.grid(row=0, column=0, columnspan=6, pady=5, padx=5)
 
-# label frame (box) for BuildsPWDmatrix parameters
-buildsPWDmatrix_LabelFrame = tk.LabelFrame(main_window, text="3. BuildsPWDmatrix parameters")
-buildsPWDmatrix_LabelFrame.grid(row=11, column=0, columnspan=6, pady=5, padx=5, sticky='WE')
+# label frame (box) for AlignImages parameters (tab1)
+alignImages_LabelFrame = tk.LabelFrame(tab1, text="2. AlignImages parameters")
+alignImages_LabelFrame.grid(row=11, column=0, columnspan=6, pady=5, padx=5, sticky='WE')
 
-# label frame (box) for SegmentedObjects parameters
-segmentedObjects_LabelFrame = tk.LabelFrame(main_window, text="4. SegmentedObjects parameters")
-segmentedObjects_LabelFrame.grid(row=17, column=0, columnspan=6, pady=5, padx=5, sticky='WE')
+# label frame (box) for AlignImages parameters (tab2)
+alignImages_LabelFrame2 = tk.LabelFrame(tab2, text="1. AlignImages parameters")
+alignImages_LabelFrame2.grid(row=0, column=0, columnspan=6, pady=5, padx=5, sticky='WE')
 
-# label frame (box) for Labels parameters
-labels_LabelFrame = tk.LabelFrame(main_window, text="5. Labels parameters")
-labels_LabelFrame.grid(row=19, column=0, columnspan=6, pady=5, padx=5, sticky='WE')
+# label frame (box) for BuildsPWDmatrix parameters (tab2)
+buildsPWDmatrix_LabelFrame = tk.LabelFrame(tab2, text="2. BuildsPWDmatrix parameters")
+buildsPWDmatrix_LabelFrame.grid(row=1, column=0, columnspan=6, pady=5, padx=5, sticky='WE')
+#
+# label frame (box) for SegmentedObjects parameters (tab2)
+segmentedObjects_LabelFrame = tk.LabelFrame(tab2, text="3. SegmentedObjects parameters")
+segmentedObjects_LabelFrame.grid(row=7, column=0, columnspan=6, pady=5, padx=5, sticky='WE')
+
+# label frame (box) for Labels parameters (tab2)
+labels_LabelFrame = tk.LabelFrame(tab2, text="4. Labels parameters")
+labels_LabelFrame.grid(row=9, column=0, columnspan=6, pady=5, padx=5, sticky='WE')
 
 # ---------------------------Help Box-----------------------------------
 help_label = tk.Label(help_LabelFrame,
@@ -92,124 +116,132 @@ help_label = tk.Label(help_LabelFrame,
                       width=50,
                       justify='center',
                       wraplength=350)
-help_label.grid()
+help_label.grid(row=0, column=6, rowspan=11)
+
+# ---------------------------Image pyHiM----------------------------------------------------------
+img = tk.PhotoImage(file="./pyHiM_image.png")
+img = img.zoom(10)
+img = img.subsample(15)
+label_img = tk.Label(main_window, image=img)
+label_img.grid(row=10, column=6, pady=10)
+
 
 # -----------------------------------------Help Button--------------------------------------------
-# Dapi Channel Help Button:
+# Dapi Channel Help Button (tab1):
 dapi_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "DAPI_channel"))
 dapi_ch_HelpButton.grid(row=0, column=0)
 
-# Dapi Fiducial Channel Help Button:
+# Dapi Fiducial Channel Help Button (tab1):
 dapiFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "fiducialDAPI_channel"))
 dapiFid_ch_HelpButton.grid(row=0, column=3)
 
-# Barcode Channel Help Button:
+# Barcode Channel Help Button (tab1):
 barcode_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "barcode_channel"))
 barcode_ch_HelpButton.grid(row=3, column=0)
 
-# Barcode Fiducial Channel Help Button:
+# Barcode Fiducial Channel Help Button (tab1):
 barcodeFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "fiducialBarcode_channel"))
 barcodeFid_ch_HelpButton.grid(row=3, column=3)
 
-# Mask Channel Help Button:
+# Mask Channel Help Button (tab1):
 mask_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "mask_channel"))
 mask_ch_HelpButton.grid(row=5, column=0)
 
-# Barcode Fiducial Channel Help Button:
+# Barcode Fiducial Channel Help Button (tab1):
 maskFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "fiducialMask_channel"))
 maskFid_ch_HelpButton.grid(row=5, column=3)
 
-# RNA Channel Help Button:
+# RNA Channel Help Button (tab1):
 rna_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "RNA_channel"))
 rna_ch_HelpButton.grid(row=7, column=0)
 
-# # RNA Fiducial Channel Help Button:
+# # RNA Fiducial Channel Help Button (tab1):
 # rnaFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "fiducialRNA_channel"))
 # rnaFid_ch_HelpButton.grid(row=6, column=3)
 
-# pixelSizeXY Help Button:
+# pixelSizeXY Help Button (tab1):
 pixelSizeXY_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "pixelSizeXY"))
 pixelSizeXY_HelpButton.grid(row=10, column=0)
 
-# pixelSizeZ Help Button:
+# pixelSizeZ Help Button (tab1):
 pixelSizeZ_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "pixelSizeZ"))
 pixelSizeZ_HelpButton.grid(row=10, column=3)
 
-# BlockSize Help Button:
-blockSize_HelpButton = tk.Button(alignImages_LabelFrame, text="?", command=partial(display_help, "blockSize"))
-blockSize_HelpButton.grid(row=11, column=0)
-
-# ReferenceFiducial Help Button:
+# ReferenceFiducial Help Button (tab1):
 referenceFiducial_HelpButton = tk.Button(alignImages_LabelFrame, text="?", command=partial(display_help, "referenceFiducial"))
 referenceFiducial_HelpButton.grid(row=12, column=0)
 
-# flux_min Help Button:
+# BlockSize Help Button (tab2):
+blockSize_HelpButton = tk.Button(alignImages_LabelFrame2, text="?", command=partial(display_help, "blockSize"))
+blockSize_HelpButton.grid(row=0, column=0)
+
+# flux_min Help Button (tab2):
 flux_min_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "flux_min"))
-flux_min_HelpButton.grid(row=13, column=0)
+flux_min_HelpButton.grid(row=1, column=0)
 
-#flux_min_3D Help Button:
+#flux_min_3D Help Button (tab2):
 flux_min_3D_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "flux_min_3D"))
-flux_min_3D_HelpButton.grid(row=13, column=3)
+flux_min_3D_HelpButton.grid(row=1, column=3)
 
-# toleranceDrift Help Button:
+# toleranceDrift Help Button (tab2):
 toleranceDrift_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "toleranceDrift"))
-toleranceDrift_HelpButton.grid(row=14, column=0)
+toleranceDrift_HelpButton.grid(row=2, column=0)
 
-# mask_expansion Help Button:
+# mask_expansion Help Button (tab2):
 mask_expansion_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "mask_expansion"))
-mask_expansion_HelpButton.grid(row=14, column=3)
+mask_expansion_HelpButton.grid(row=2, column=3)
 
-# folder Help Button:
+# folder Help Button (tab2):
 mask_expansion_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "folder"))
-mask_expansion_HelpButton.grid(row=15, column=0)
+mask_expansion_HelpButton.grid(row=3, column=0)
 
-# masks2process Help Button:
+# masks2process Help Button (tab2):
 masks2process_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "masks2process"))
-masks2process_HelpButton.grid(row=16, column=0)
+masks2process_HelpButton.grid(row=4, column=0)
 
-# tracing_method Help Button:
+# tracing_method Help Button (tab2):
 tracing_method_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "tracing_method"))
-tracing_method_HelpButton.grid(row=17, column=0)
+tracing_method_HelpButton.grid(row=5, column=0)
 
-# KDtree_distance_threshold_mum Help Button:
+# KDtree_distance_threshold_mum Help Button (tab2):
 tracing_method_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "KDtree_distance_threshold_mum"))
-tracing_method_HelpButton.grid(row=18, column=0)
+tracing_method_HelpButton.grid(row=6, column=0)
 
-# stardist_basename Help Button
+# stardist_basename Help Button (tab2):
 stardist_HelpButton = tk.Button(segmentedObjects_LabelFrame, text="?", command=partial(display_help, "Stardist_basename"))
-stardist_HelpButton.grid(row=19, column=0)
+stardist_HelpButton.grid(row=7, column=0)
 
-# brightest Help Button
+# brightest Help Button (tab2):
 brightest_HelpButton = tk.Button(segmentedObjects_LabelFrame, text="?", command=partial(display_help, "brightest"))
-brightest_HelpButton.grid(row=20, column=0)
+brightest_HelpButton.grid(row=8, column=0)
 
-# segmentObject_Labels_aeramax Help Button
-segmentObject_Labels_aeraMax_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "segmentObject_Labels_aeraMax"))
-segmentObject_Labels_aeraMax_HelpButton.grid(row=22, column=0)
-# segmentObject_Labels_aeramin Help Button
-segmentObject_Labels_aeraMin_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "segmentObject_Labels_aeraMin"))
-segmentObject_Labels_aeraMin_HelpButton.grid(row=23, column=0)
+# segmentObject_Labels_aeramax Help Button (tab2):
+segmentObject_Labels_aeraMax_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "segmentObject_Labels_dapi_aeraMax"))
+segmentObject_Labels_aeraMax_HelpButton.grid(row=10, column=0)
+# segmentObject_Labels_aeramin Help Button (tab2):
+segmentObject_Labels_aeraMin_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "segmentObject_Labels_dapi_aeraMin"))
+segmentObject_Labels_aeraMin_HelpButton.grid(row=11, column=0)
 
-# ZProject_dapi_zmax Help Button
+# ZProject_dapi_zmax Help Button (tab2):
 zProject_zmax_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "zProject_dapi_zmax"))
-zProject_zmax_HelpButton.grid(row=22, column=4)
-# ZProject_dapi_zmin Help Button
+zProject_zmax_HelpButton.grid(row=10, column=4)
+# ZProject_dapi_zmin Help Button (tab2):
 zProject_zmin_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "zProject_dapi_zmin"))
-zProject_zmin_HelpButton.grid(row=23, column=4)
+zProject_zmin_HelpButton.grid(row=11, column=4)
 
-# ZProject_Bcd_zmax Help Button
+# ZProject_Bcd_zmax Help Button (tab2):
 zProject_Bcd_zmax_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "zProject_Bcd_zmax"))
-zProject_Bcd_zmax_HelpButton.grid(row=25, column=0)
-# ZProject_Bcd_zmin Help Button
+zProject_Bcd_zmax_HelpButton.grid(row=13, column=0)
+# ZProject_Bcd_zmin Help Button (tab2):
 zProject_Bcd_zmin_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "zProject_Bcd_zmin"))
-zProject_Bcd_zmin_HelpButton.grid(row=26, column=0)
+zProject_Bcd_zmin_HelpButton.grid(row=14, column=0)
 
-# ZProject_Mask_zmax Help Button
+# ZProject_Mask_zmax Help Button (tab2):
 zProject_Mask_zmax_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "zProject_Mask_zmax"))
-zProject_Mask_zmax_HelpButton.grid(row=25, column=4)
-# ZProject_Mask_zmin Help Button
+zProject_Mask_zmax_HelpButton.grid(row=13, column=4)
+# ZProject_Mask_zmin Help Button (tab2):
 zProject_Mask_zmin_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "zProject_Mask_zmin"))
-zProject_Mask_zmin_HelpButton.grid(row=26, column=4)
+zProject_Mask_zmin_HelpButton.grid(row=14, column=4)
 
 
 # --------------------------Label of different channels for acquisition_labelFrame---------------------
@@ -237,12 +269,15 @@ rna_ch_label.grid(row=7, column=1)
 # # RNA Fiducial Channel Label:
 # rnaFid_ch_label = tk.Label(acquisition_labelFrame, text="RNA Fiducial Channel :")
 # rnaFid_ch_label.grid(row=6, column=4)
+
 # pixelSizeXY Label:
 pixelSizeXY_label = tk.Label(acquisition_labelFrame, text="Pixel size (XY) :")
 pixelSizeXY_label.grid(row=10, column=1)
+
 # pixelSizeZ Label:
 pixelSizeZ_label = tk.Label(acquisition_labelFrame, text="Pixel size (Z) :")
 pixelSizeZ_label.grid(row=10, column=4)
+
 # --------------------------Entry for acquisition_labelFrame---------------------
 # pixelSizeXY Entry
 pixelSizeXY_Entry = tk.Entry(acquisition_labelFrame)
@@ -347,83 +382,87 @@ rna_ch_Radiobutton3.grid(row=9, column=2)
 # rnaFid_ch_Radiobutton2.grid(row=7, column=5)
 
 
-# --------------------------------alignImages parameters-------------------------------
-# BlockSize Label
-blockSize_label = tk.Label(alignImages_LabelFrame, text="Block Size :")
-blockSize_label.grid(row=11, column=1)
+
+# --------------------------------alignImages parameters Reference fiducial (tab1)-------------------------------
 
 # ReferenceFiducial Label
 referenceFiducial_label = tk.Label(alignImages_LabelFrame, text="Reference Fiducial :")
 referenceFiducial_label.grid(row=12, column=1)
-
-# BlockSize Entry
-blockSize_Entry = tk.Entry(alignImages_LabelFrame)
-value = default_Entry_dic["blockSize_Entry"]
-blockSize_Entry.insert(0, string=value)
-entries_dic["blockSize_Entry"]=[blockSize_Entry, value, type(value)]
-blockSize_Entry.grid(row=11, column=2)
 
 # ReferenceFiducial Entry
 referenceFiducial_Entry = tk.Entry(alignImages_LabelFrame)
 value = default_Entry_dic["referenceFiducial_Entry"]
 referenceFiducial_Entry.insert(0, string=value)
 entries_dic["referenceFiducial_Entry"]=[referenceFiducial_Entry, value, type(value)]
-referenceFiducial_Entry.grid(row=12, column=2)
+referenceFiducial_Entry.grid(row=12, column=2, pady=15)
 
-# -----------------------------buildsPWDmatrix parameters-------------------------------
+# --------------------------------alignImages parameters Block Size (tab2)-------------------------------
+
+# BlockSize Label
+blockSize_label = tk.Label(alignImages_LabelFrame2, text="Block Size :")
+blockSize_label.grid(row=0, column=1)
+
+# BlockSize Entry
+blockSize_Entry = tk.Entry(alignImages_LabelFrame2)
+value = default_Entry_dic["blockSize_Entry"]
+blockSize_Entry.insert(0, string=value)
+entries_dic["blockSize_Entry"]=[blockSize_Entry, value, type(value)]
+blockSize_Entry.grid(row=0, column=2, pady=15)
+
+# -----------------------------buildsPWDmatrix parameters tab2)-------------------------------
 
 # flux_min Label
 flux_min_label = tk.Label(buildsPWDmatrix_LabelFrame, text="flux_min :")
-flux_min_label.grid(row=13, column=1)
+flux_min_label.grid(row=1, column=1)
 
 # flux_min_3D label
 flux_min_3D_label = tk.Label(buildsPWDmatrix_LabelFrame, text="flux_min_3D :")
-flux_min_3D_label.grid(row=13, column=4)
+flux_min_3D_label.grid(row=1, column=4)
 
 # toleranceDrift label
 toleranceDrift_label = tk.Label(buildsPWDmatrix_LabelFrame, text="toleranceDrift :")
-toleranceDrift_label.grid(row=14, column=1)
+toleranceDrift_label.grid(row=2, column=1)
 
 # mask_expansion label
 mask_expansion_label = tk.Label(buildsPWDmatrix_LabelFrame, text="mask_expansion :")
-mask_expansion_label.grid(row=14, column=4)
+mask_expansion_label.grid(row=2, column=4)
 
 # folder label
 folder_label = tk.Label(buildsPWDmatrix_LabelFrame, text="folder :")
-folder_label.grid(row=15, column=1)
+folder_label.grid(row=3, column=1)
 
 # masks2process label
 masks2process_label = tk.Label(buildsPWDmatrix_LabelFrame, text="masks2process :")
-masks2process_label.grid(row=16, column=1)
+masks2process_label.grid(row=4, column=1)
 
 # tracing_method label
 tracing_method_label = tk.Label(buildsPWDmatrix_LabelFrame, text="tracing_method :")
-tracing_method_label.grid(row=17, column=1)
+tracing_method_label.grid(row=5, column=1)
 
 # KDtree_distance_threshold_mum label
 KDtree_distance_threshold_mum_label = tk.Label(buildsPWDmatrix_LabelFrame, text="KDtree_distance_threshold_mum :")
-KDtree_distance_threshold_mum_label.grid(row=18, column=1)
+KDtree_distance_threshold_mum_label.grid(row=6, column=1)
 
 # flux_min Entry
 flux_min_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
 value = default_Entry_dic["flux_min_Entry"]
 flux_min_Entry.insert(0, string=value)
 entries_dic["flux_min_Entry"] = [flux_min_Entry, value, type(value)]
-flux_min_Entry.grid(row=13, column=2)
+flux_min_Entry.grid(row=1, column=2)
 
 # flux_min_3D Entry
 flux_min_3D_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=10)
 value = default_Entry_dic["flux_min_3D_Entry"]
 flux_min_3D_Entry.insert(0, string=value)
 entries_dic["flux_min_3D_Entry"] = [flux_min_3D_Entry, value, type(value)]
-flux_min_3D_Entry.grid(row=13, column=5)
+flux_min_3D_Entry.grid(row=1, column=5)
 
 # toleranceDrift Entry
 toleranceDrift_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
 value = default_Entry_dic["toleranceDrift_Entry"]
 toleranceDrift_Entry.insert(0, string=value)
 entries_dic["toleranceDrift_Entry"] = [toleranceDrift_Entry, value, type(value)]
-toleranceDrift_Entry.grid(row=14, column=2)
+toleranceDrift_Entry.grid(row=2, column=2)
 
 
 # mask_expansion Entry
@@ -431,154 +470,186 @@ mask_expansion_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=10)
 value = default_Entry_dic["mask_expansion_Entry"]
 mask_expansion_Entry.insert(0, string=value)
 entries_dic["mask_expansion_Entry"] = [mask_expansion_Entry, value, type(value)]
-mask_expansion_Entry.grid(row=14, column=5)
+mask_expansion_Entry.grid(row=2, column=5)
 
 # folder Entry
 folder_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
 value = default_Entry_dic["folder_Entry"]
 folder_Entry.insert(0, string=value)
 entries_dic["folder_Entry"] = [folder_Entry, value, type(value)]
-folder_Entry.grid(row=15, column=2)
+folder_Entry.grid(row=3, column=2)
 
 # masks2process Entry
 masks2process_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
 value = default_Entry_dic["masks2process_Entry"]
 masks2process_Entry.insert(0, string=value)
 entries_dic["masks2process_Entry"] = [masks2process_Entry, value, type(value)]
-masks2process_Entry.grid(row=16, column=2)
+masks2process_Entry.grid(row=4, column=2)
 
 # tracing_method Entry
 tracing_method_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
 value = default_Entry_dic["tracing_method_Entry"]
 tracing_method_Entry.insert(0, string=value)
 entries_dic["tracing_method_Entry"] = [tracing_method_Entry, value, type(value)]
-tracing_method_Entry.grid(row=17, column=2)
+tracing_method_Entry.grid(row=5, column=2)
 
 # KDtree_distance_threshold_mum Entry
 KDtree_distance_threshold_mum_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
 value = default_Entry_dic["KDtree_distance_threshold_mum_Entry"]
 KDtree_distance_threshold_mum_Entry.insert(0, string=value)
 entries_dic["KDtree_distance_threshold_mum_Entry"] = [KDtree_distance_threshold_mum_Entry, value, type(value)]
-KDtree_distance_threshold_mum_Entry.grid(row=18, column=2)
+KDtree_distance_threshold_mum_Entry.grid(row=6, column=2)
 
-# ----------------------SegmentedObjects parameters-----------------------------------
+# ----------------------SegmentedObjects parameters (tab2)-----------------------------------
 # stardist_basename Label
 stardist_label = tk.Label(segmentedObjects_LabelFrame, text="Stardist_basename :")
-stardist_label.grid(row=19, column=1)
+stardist_label.grid(row=7, column=1)
 
 # brightest Label
 brightest_label = tk.Label(segmentedObjects_LabelFrame, text="Brightest :")
-brightest_label.grid(row=20, column=1)
+brightest_label.grid(row=8, column=1)
 
 # stardist_basename Entry
 stardist_Entry = tk.Entry(segmentedObjects_LabelFrame, width=65)
 value = default_Entry_dic["stardist_Entry"]
 stardist_Entry.insert(0, string=value)
 entries_dic["stardist_Entry"] = [stardist_Entry, value, type(value)]
-stardist_Entry.grid(row=19, column=2)
+stardist_Entry.grid(row=7, column=2)
 
 # brightest Entry
 brightest_Entry = tk.Entry(segmentedObjects_LabelFrame, width=25)
 value = default_Entry_dic["brightest_Entry"]
 brightest_Entry.insert(0, string=value)
 entries_dic["brightest_Entry"] = [brightest_Entry, value, type(value)]
-brightest_Entry.grid(row=20, column=2)
+brightest_Entry.grid(row=8, column=2)
 
 
-# -----------------------------------Labels parameters-------------------------------------------
+# -----------------------------------Labels parameters (tab2)-------------------------------------------
 
 # segmentedObjects Aera Label
-segmentedObjects_label = tk.Label(labels_LabelFrame, text="SegmentedObjects :")
-segmentedObjects_label.grid(row=21, column=0)
+segmentedObjects_label = tk.Label(labels_LabelFrame, text="Dapi_SegmentedObjects :")
+segmentedObjects_label.grid(row=9, column=0)
 #       Aera_max Label
 aeraMaxSegOblt_label = tk.Label(labels_LabelFrame, text="Aera_max :")
-aeraMaxSegOblt_label.grid(row=22, column=1)
+aeraMaxSegOblt_label.grid(row=10, column=1)
 #       Aera_min Label
 aeraMinSegOblt_label = tk.Label(labels_LabelFrame, text="Aera_min :")
-aeraMinSegOblt_label.grid(row=23, column=1)
+aeraMinSegOblt_label.grid(row=11, column=1)
 
 # zProject for Dapi Label
 zProjectDapi_label = tk.Label(labels_LabelFrame, text="zProject for Dapi :")
-zProjectDapi_label.grid(row=21, column=4)
+zProjectDapi_label.grid(row=9, column=4)
 #       zmax Dapi Label
 zmaxZProjct_dapi_label = tk.Label(labels_LabelFrame, text="zmax :")
-zmaxZProjct_dapi_label.grid(row=22, column=5)
+zmaxZProjct_dapi_label.grid(row=10, column=5)
 #       zmin Dapi Label
 zminZProjct_dapi_label = tk.Label(labels_LabelFrame, text="zmin :")
-zminZProjct_dapi_label.grid(row=23, column=5)
+zminZProjct_dapi_label.grid(row=11, column=5)
 
 # zProject barcode Label
 zProjectBcd_label = tk.Label(labels_LabelFrame, text="zProject for Barcode :")
-zProjectBcd_label.grid(row=24, column=0)
+zProjectBcd_label.grid(row=12, column=0)
 #       zmax Label
 zmaxZProjct_Bcd_label = tk.Label(labels_LabelFrame, text="zmax :")
-zmaxZProjct_Bcd_label.grid(row=25, column=1)
+zmaxZProjct_Bcd_label.grid(row=13, column=1)
 #       zmin Label
 zminZProjct_Bcd_label = tk.Label(labels_LabelFrame, text="zmin :")
-zminZProjct_Bcd_label.grid(row=26, column=1)
+zminZProjct_Bcd_label.grid(row=14, column=1)
 
 # zProject mask Label
 zProjectMask_label = tk.Label(labels_LabelFrame, text="zProject for Mask :")
-zProjectMask_label.grid(row=24, column=4)
+zProjectMask_label.grid(row=12, column=4)
 #       zmax Label
 zmaxZProjct_Mask_label = tk.Label(labels_LabelFrame, text="zmax :")
-zmaxZProjct_Mask_label.grid(row=25, column=5)
+zmaxZProjct_Mask_label.grid(row=13, column=5)
 #       zmin Label
 zminZProjct_Mask_label = tk.Label(labels_LabelFrame, text="zmin :")
-zminZProjct_Mask_label.grid(row=26, column=5)
+zminZProjct_Mask_label.grid(row=14, column=5)
 
 # segmentedObjects Aera_max Entry
-aeraMaxSegObjt_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["aeraMaxSegObjt_Entry"]
-aeraMaxSegObjt_Entry.insert(0, string=value)
-entries_dic["aeraMaxSegObjt_Entry"] = [aeraMaxSegObjt_Entry, value, type(value)]
-aeraMaxSegObjt_Entry.grid(row=22, column=2)
+aeraMmax_dapi_SegOblt_Entry = tk.Entry(labels_LabelFrame, width=10)
+value = default_Entry_dic["aeraMmax_dapi_SegOblt_Entry"]
+aeraMmax_dapi_SegOblt_Entry.insert(0, string=value)
+entries_dic["aeraMax_dapi_SegOblt_Entry"] = [aeraMmax_dapi_SegOblt_Entry, value, type(value)]
+aeraMmax_dapi_SegOblt_Entry.grid(row=10, column=2)
 # segmentedObjects Aera_min Entry
-aeraMinSegObjt_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["aeraMinSegObjt_Entry"]
-aeraMinSegObjt_Entry.insert(0, string=value)
-entries_dic["aeraMinSegObjt_Entry"] = [aeraMinSegObjt_Entry, value, type(value)]
-aeraMinSegObjt_Entry.grid(row=23, column=2)
+aeraMin_dapi_SegOblt_Entry = tk.Entry(labels_LabelFrame, width=10)
+value = default_Entry_dic["aeraMin_dapi_SegOblt_Entry"]
+aeraMin_dapi_SegOblt_Entry.insert(0, string=value)
+entries_dic["aeraMin_dapi_SegOblt_Entry"] = [aeraMin_dapi_SegOblt_Entry, value, type(value)]
+aeraMin_dapi_SegOblt_Entry.grid(row=11, column=2)
 
 # zProject zmax Entry
 zProject_Dapi_zmax_Entry = tk.Entry(labels_LabelFrame, width=10)
 value = default_Entry_dic["zProject_Dapi_zmax_Entry"]
 zProject_Dapi_zmax_Entry.insert(0, string=value)
 entries_dic["zProject_Dapi_zmax_Entry"] = [zProject_Dapi_zmax_Entry, value, type(value)]
-zProject_Dapi_zmax_Entry.grid(row=22, column=6)
+zProject_Dapi_zmax_Entry.grid(row=10, column=6)
 
 # zProject zmin Entry
 zProject_Dapi_zmin_Entry = tk.Entry(labels_LabelFrame, width=10)
 value = default_Entry_dic["zProject_Dapi_zmin_Entry"]
 zProject_Dapi_zmin_Entry.insert(0, string=value)
 entries_dic["zProject_Dapi_zmin_Entry"] = [zProject_Dapi_zmin_Entry, value, type(value)]
-zProject_Dapi_zmin_Entry.grid(row=23, column=6)
+zProject_Dapi_zmin_Entry.grid(row=11, column=6)
 
 
 # zProject barcode zmax Entry
-zmaxZProjct_Bcd_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["zmaxZProjct_Bcd_Entry"]
-zmaxZProjct_Bcd_Entry.insert(0, string=value)
-entries_dic["zmaxZProjct_Bcd_Entry"] = [zmaxZProjct_Bcd_Entry, value, type(value)]
-zmaxZProjct_Bcd_Entry.grid(row=25, column=2)
+zProject_Bcd_zmax_Entry = tk.Entry(labels_LabelFrame, width=10)
+value = default_Entry_dic["zProject_Bcd_zmax_Entry"]
+zProject_Bcd_zmax_Entry.insert(0, string=value)
+entries_dic["zProject_Bcd_zmax_Entry"] = [zProject_Bcd_zmax_Entry, value, type(value)]
+zProject_Bcd_zmax_Entry.grid(row=13, column=2)
 # zProject barcode zmin Entry
-zminZProjct_Bcd_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["zminZProjct_Bcd_Entry"]
-zminZProjct_Bcd_Entry.insert(0, string=value)
-entries_dic["zminZProjct_Bcd_Entry"] = [zminZProjct_Bcd_Entry, value, type(value)]
-zminZProjct_Bcd_Entry.grid(row=26, column=2)
+zProject_Bcd_zmin_Entry = tk.Entry(labels_LabelFrame, width=10)
+value = default_Entry_dic["zProject_Bcd_zmin_Entry"]
+zProject_Bcd_zmin_Entry.insert(0, string=value)
+entries_dic["zProject_Bcd_zmin_Entry"] = [zProject_Bcd_zmin_Entry, value, type(value)]
+zProject_Bcd_zmin_Entry.grid(row=14, column=2)
 
 # zProject mask zmax Entry
-zmaxZProjct_Mask_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["zmaxZProjct_Mask_Entry"]
-zmaxZProjct_Mask_Entry.insert(0, string=value)
-entries_dic["zmaxZProjct_Mask_Entry"] = [zmaxZProjct_Mask_Entry, value, type(value)]
-zmaxZProjct_Mask_Entry.grid(row=25, column=6)
+zProject_Mask_zmax_Entry = tk.Entry(labels_LabelFrame, width=10)
+value = default_Entry_dic["zProject_Mask_zmax_Entry"]
+zProject_Mask_zmax_Entry.insert(0, string=value)
+entries_dic["zProject_Mask_zmax_Entry"] = [zProject_Mask_zmax_Entry, value, type(value)]
+zProject_Mask_zmax_Entry.grid(row=13, column=6)
 # zProject mask zmin Entry
-zminZProjct_Mask_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["zminZProjct_Mask_Entry"]
-zminZProjct_Mask_Entry.insert(0, string=value)
-entries_dic["zminZProjct_Mask_Entry"] = [zminZProjct_Mask_Entry, value, type(value)]
-zminZProjct_Mask_Entry.grid(row=26, column=6)
+zProject_Mask_zmin_Entry = tk.Entry(labels_LabelFrame, width=10)
+value = default_Entry_dic["zProject_Mask_zmin_Entry"]
+zProject_Mask_zmin_Entry.insert(0, string=value)
+entries_dic["zProject_Mask_zmin_Entry"] = [zProject_Mask_zmin_Entry, value, type(value)]
+zProject_Mask_zmin_Entry.grid(row=14, column=6)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 main_window.mainloop()
