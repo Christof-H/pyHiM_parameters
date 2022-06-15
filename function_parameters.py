@@ -17,55 +17,54 @@ def convert_list_to_string(liste: list):
     return string
 
 
-def import_parameters():
+def import_parameters(currentDir, scriptDir):
     """Function that imports by default the parameters from the infoList.json
     located in the current directory. If there is no infoList in the current
     directory, the parameters are imported from the infoList.json located in
     the script directory. Return the parameters are stored in a dictionary
     """
-    current_dir = os.getcwd()
-    infolist_path = current_dir + os.sep + "infoList.json"
-    print()
-    if os.path.exists(infolist_path):
-        with open(infolist_path, mode='r') as file:
-            infoList_dic = json.load(file)
+    infolistCurrent_path = currentDir + os.sep + "infoList.json"
+    infolistScript_path = scriptDir + os.sep + "infoList.json"
+    if os.path.exists(infolistCurrent_path):
+        with open(infolistCurrent_path, mode='r') as file:
+            dic_full = json.load(file)
     else:
-        with open("./infoList.json", mode='r') as file:
-            infoList_dic = json.load(file)
+        with open(infolistScript_path, mode='r') as file:
+            dic_full = json.load(file)
 
     dic = {}
-    dic["dapi_ch"] = infoList_dic["common"]["acquisition"]["DAPI_channel"]
-    dic["dapiFid_ch"] = infoList_dic["common"]["acquisition"]["fiducialDAPI_channel"]
-    dic["barcode_ch"] = infoList_dic["common"]["acquisition"]["barcode_channel"]
-    dic["barcodeFid_ch"] = infoList_dic["common"]["acquisition"]["fiducialBarcode_channel"]
-    dic["mask_ch"] = infoList_dic["common"]["acquisition"]["mask_channel"]
-    dic["maskFid_ch"] = infoList_dic["common"]["acquisition"]["fiducialMask_channel"]
-    dic["rna_ch"] = infoList_dic["common"]["acquisition"]["RNA_channel"]
-    # dic["rnaFid_ch"] = infoList_dic["common"]["acquisition"][""]
-    dic["pixelSizeXY_Entry"] = infoList_dic["common"]["acquisition"]["pixelSizeXY"]
-    dic["pixelSizeZ_Entry"] = infoList_dic["common"]["acquisition"]["pixelSizeZ"]
-    dic["referenceFiducial_Entry"] = infoList_dic["common"]["alignImages"]["referenceFiducial"]
-    dic["blockSize_Entry"] = infoList_dic["common"]["alignImages"]["blockSize"]
-    dic["flux_min_Entry"] = infoList_dic["common"]["buildsPWDmatrix"]["flux_min"]
-    dic["flux_min_3D_Entry"] = infoList_dic["common"]["buildsPWDmatrix"]["flux_min_3D"]
-    dic["toleranceDrift_Entry"] = infoList_dic["common"]["buildsPWDmatrix"]["toleranceDrift"]
-    dic["mask_expansion_Entry"] = infoList_dic["common"]["buildsPWDmatrix"]["mask_expansion"]
-    dic["folder_Entry"] = infoList_dic["common"]["buildsPWDmatrix"]["folder"]
-    dic["masks2process_Entry"] = convert_Dic_to_string(infoList_dic["common"]["buildsPWDmatrix"]["masks2process"])
-    dic["tracing_method_Entry"] = convert_list_to_string(infoList_dic["common"]["buildsPWDmatrix"]["tracing_method"])
-    dic["KDtree_distance_threshold_mum_Entry"] = infoList_dic["common"]["buildsPWDmatrix"][
+    dic["dapi_ch"] = dic_full["common"]["acquisition"]["DAPI_channel"]
+    dic["dapiFid_ch"] = dic_full["common"]["acquisition"]["fiducialDAPI_channel"]
+    dic["barcode_ch"] = dic_full["common"]["acquisition"]["barcode_channel"]
+    dic["barcodeFid_ch"] = dic_full["common"]["acquisition"]["fiducialBarcode_channel"]
+    dic["mask_ch"] = dic_full["common"]["acquisition"]["mask_channel"]
+    dic["maskFid_ch"] = dic_full["common"]["acquisition"]["fiducialMask_channel"]
+    dic["rna_ch"] = dic_full["common"]["acquisition"]["RNA_channel"]
+    # dic["rnaFid_ch"] = dic_full["common"]["acquisition"][""]
+    dic["pixelSizeXY_Entry"] = dic_full["common"]["acquisition"]["pixelSizeXY"]
+    dic["pixelSizeZ_Entry"] = dic_full["common"]["acquisition"]["pixelSizeZ"]
+    dic["referenceFiducial_Entry"] = dic_full["common"]["alignImages"]["referenceFiducial"]
+    dic["blockSize_Entry"] = dic_full["common"]["alignImages"]["blockSize"]
+    dic["flux_min_Entry"] = dic_full["common"]["buildsPWDmatrix"]["flux_min"]
+    dic["flux_min_3D_Entry"] = dic_full["common"]["buildsPWDmatrix"]["flux_min_3D"]
+    dic["toleranceDrift_Entry"] = dic_full["common"]["buildsPWDmatrix"]["toleranceDrift"]
+    dic["mask_expansion_Entry"] = dic_full["common"]["buildsPWDmatrix"]["mask_expansion"]
+    dic["folder_Entry"] = dic_full["common"]["buildsPWDmatrix"]["folder"]
+    dic["masks2process_Entry"] = convert_Dic_to_string(dic_full["common"]["buildsPWDmatrix"]["masks2process"])
+    dic["tracing_method_Entry"] = convert_list_to_string(dic_full["common"]["buildsPWDmatrix"]["tracing_method"])
+    dic["KDtree_distance_threshold_mum_Entry"] = dic_full["common"]["buildsPWDmatrix"][
         "KDtree_distance_threshold_mum"]
-    dic["stardist_Entry"] = infoList_dic["common"]["segmentedObjects"]["stardist_basename"]
-    dic["brightest_Entry"] = infoList_dic["common"]["segmentedObjects"]["brightest"]
-    dic["aeraMmax_dapi_SegObjt_Entry"] = infoList_dic["labels"]["DAPI"]["segmentedObjects"]["area_max"]
-    dic["aeraMin_dapi_SegObjt_Entry"] = infoList_dic["labels"]["DAPI"]["segmentedObjects"]["area_min"]
-    dic["zProject_Dapi_zmax_Entry"] = infoList_dic["labels"]["DAPI"]["zProject"]["zmax"]
-    dic["zProject_Dapi_zmin_Entry"] = infoList_dic["labels"]["DAPI"]["zProject"]["zmin"]
-    dic["zProject_Bcd_zmax_Entry"] = infoList_dic["labels"]["barcode"]["zProject"]["zmax"]
-    dic["zProject_Bcd_zmin_Entry"] = infoList_dic["labels"]["barcode"]["zProject"]["zmin"]
-    dic["zProject_Mask_zmax_Entry"] = infoList_dic["labels"]["mask"]["zProject"]["zmax"]
-    dic["zProject_Mask_zmin_Entry"] = infoList_dic["labels"]["mask"]["zProject"]["zmin"]
-    return dic
+    dic["stardist_Entry"] = dic_full["common"]["segmentedObjects"]["stardist_basename"]
+    dic["brightest_Entry"] = dic_full["common"]["segmentedObjects"]["brightest"]
+    dic["aeraMmax_dapi_SegObjt_Entry"] = dic_full["labels"]["DAPI"]["segmentedObjects"]["area_max"]
+    dic["aeraMin_dapi_SegObjt_Entry"] = dic_full["labels"]["DAPI"]["segmentedObjects"]["area_min"]
+    dic["zProject_Dapi_zmax_Entry"] = dic_full["labels"]["DAPI"]["zProject"]["zmax"]
+    dic["zProject_Dapi_zmin_Entry"] = dic_full["labels"]["DAPI"]["zProject"]["zmin"]
+    dic["zProject_Bcd_zmax_Entry"] = dic_full["labels"]["barcode"]["zProject"]["zmax"]
+    dic["zProject_Bcd_zmin_Entry"] = dic_full["labels"]["barcode"]["zProject"]["zmin"]
+    dic["zProject_Mask_zmax_Entry"] = dic_full["labels"]["mask"]["zProject"]["zmax"]
+    dic["zProject_Mask_zmin_Entry"] = dic_full["labels"]["mask"]["zProject"]["zmin"]
+    return dic, dic_full
 
 
 def is_integer(num):
@@ -134,9 +133,9 @@ def check_dict(string: str):
         return False
 
 
-def update_infoList(user_values_dic, infolist_dic):
+def update_infoList(user_values_dic, infolist_dic_full, currentDir):
     """"
-    1-Save old parameters from infolist_dic in infoList_preVersion.json in current directory.
+    1-Save old parameters from infolist_dic_full in infoList_preVersion.json in current directory.
     2-Save new parameters from user_values_dic in infoList.json in current directory.
     """
     dic_comm_acqui = {
@@ -186,24 +185,24 @@ def update_infoList(user_values_dic, infolist_dic):
     }
     # Save previous parameters contained in infolist_dic in infoList_preVersion.json file
     # in the current directory.
-    current_dir = os.getcwd()
-    infolist_previous_path = current_dir + os.sep + "infoList_preVersion.json"
+    
+    infolist_previous_path = currentDir + os.sep + "infoList_preVersion.json"
     with open(infolist_previous_path, mode='w') as file:
-        json.dump(infolist_dic, file, indent=4)
+        json.dump(infolist_dic_full, file, indent=4)
 
     # Update infolist_dic with user_values_dic and save new infoList.json
-    infolist_dic["common"]["acquisition"].update(dic_comm_acqui)
-    infolist_dic["common"]["alignImages"].update(dic_comm_aligimg)
-    infolist_dic["common"]["buildsPWDmatrix"].update(dic_comm_buildmatrix)
-    infolist_dic["common"]["segmentedObjects"].update(dic_comm_segmObj)
-    infolist_dic["labels"]["DAPI"]["segmentedObjects"].update(dic_labels_dapi_segmObj)
-    infolist_dic["labels"]["DAPI"]["zProject"].update(dic_labels_dapi_zpro)
-    infolist_dic["labels"]["barcode"]["zProject"].update(dic_labels_bcd_zpro)
-    infolist_dic["labels"]["mask"]["zProject"].update(dic_labels_mask_zpro)
+    infolist_dic_full["common"]["acquisition"].update(dic_comm_acqui)
+    infolist_dic_full["common"]["alignImages"].update(dic_comm_aligimg)
+    infolist_dic_full["common"]["buildsPWDmatrix"].update(dic_comm_buildmatrix)
+    infolist_dic_full["common"]["segmentedObjects"].update(dic_comm_segmObj)
+    infolist_dic_full["labels"]["DAPI"]["segmentedObjects"].update(dic_labels_dapi_segmObj)
+    infolist_dic_full["labels"]["DAPI"]["zProject"].update(dic_labels_dapi_zpro)
+    infolist_dic_full["labels"]["barcode"]["zProject"].update(dic_labels_bcd_zpro)
+    infolist_dic_full["labels"]["mask"]["zProject"].update(dic_labels_mask_zpro)
 
-    infolist_new_path = current_dir + os.sep + "infoList.json"
+    infolist_new_path = currentDir + os.sep + "infoList.json"
     with open(infolist_new_path, mode='w') as file:
-        json.dump(infolist_dic, file, indent=4)
+        json.dump(infolist_dic_full, file, indent=4)
 
 
 def check_settings(entries_dic):
