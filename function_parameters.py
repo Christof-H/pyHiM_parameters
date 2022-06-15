@@ -1,6 +1,71 @@
 import re
+import os
 from tkinter import messagebox
 import json
+
+
+def convert_Dic_to_string(dic: dict):
+    """Convert a dictionnary {'nuclei':'DAPI','mask1':'mask0'} to a simple
+    string: 'nuclei: DAPI, mask1: mask0'."""
+    string = str(dic).replace("'", "").replace('{','').replace('}','')
+    return string
+
+
+def convert_list_to_string(liste: list):
+    """Convert a list of type ['masking','clustering'] to a sting of type ''."""
+    string = str(liste).replace("'", "").replace('[','').replace(']','')
+    return string
+
+
+def import_parameters():
+    """Function that imports by default the parameters from the infoList.json
+    located in the current directory. If there is no infoList in the current
+    directory, the parameters are imported from the infoList.json located in
+    the script directory. Return the parameters are stored in a dictionary
+    """
+    current_dir = os.getcwd()
+    infolist_path = current_dir + os.sep + "infoList.json"
+    print()
+    if os.path.exists(infolist_path):
+        with open(infolist_path, mode='r') as file:
+            infoList_dic = json.load(file)
+    else:
+        with open("./infoList.json", mode='r') as file:
+            infoList_dic = json.load(file)
+
+    dic = {}
+    dic["dapi_ch"] = infoList_dic["common"]["acquisition"]["DAPI_channel"]
+    dic["dapiFid_ch"] = infoList_dic["common"]["acquisition"]["fiducialDAPI_channel"]
+    dic["barcode_ch"] = infoList_dic["common"]["acquisition"]["barcode_channel"]
+    dic["barcodeFid_ch"] = infoList_dic["common"]["acquisition"]["fiducialBarcode_channel"]
+    dic["mask_ch"] = infoList_dic["common"]["acquisition"]["mask_channel"]
+    dic["maskFid_ch"] = infoList_dic["common"]["acquisition"]["fiducialMask_channel"]
+    dic["rna_ch"] = infoList_dic["common"]["acquisition"]["RNA_channel"]
+    # dic["rnaFid_ch"] = infoList_dic["common"]["acquisition"][""]
+    dic["pixelSizeXY_Entry"] = infoList_dic["common"]["acquisition"]["pixelSizeXY"]
+    dic["pixelSizeZ_Entry"] = infoList_dic["common"]["acquisition"]["pixelSizeZ"]
+    dic["referenceFiducial_Entry"] = infoList_dic["common"]["alignImages"]["referenceFiducial"]
+    dic["blockSize_Entry"] = infoList_dic["common"]["alignImages"]["blockSize"]
+    dic["flux_min_Entry"] = infoList_dic["common"]["buildsPWDmatrix"]["flux_min"]
+    dic["flux_min_3D_Entry"] = infoList_dic["common"]["buildsPWDmatrix"]["flux_min_3D"]
+    dic["toleranceDrift_Entry"] = infoList_dic["common"]["buildsPWDmatrix"]["toleranceDrift"]
+    dic["mask_expansion_Entry"] = infoList_dic["common"]["buildsPWDmatrix"]["mask_expansion"]
+    dic["folder_Entry"] = infoList_dic["common"]["buildsPWDmatrix"]["folder"]
+    dic["masks2process_Entry"] = convert_Dic_to_string(infoList_dic["common"]["buildsPWDmatrix"]["masks2process"])
+    dic["tracing_method_Entry"] = convert_list_to_string(infoList_dic["common"]["buildsPWDmatrix"]["tracing_method"])
+    dic["KDtree_distance_threshold_mum_Entry"] = infoList_dic["common"]["buildsPWDmatrix"][
+        "KDtree_distance_threshold_mum"]
+    dic["stardist_Entry"] = infoList_dic["common"]["segmentedObjects"]["stardist_basename"]
+    dic["brightest_Entry"] = infoList_dic["common"]["segmentedObjects"]["brightest"]
+    dic["aeraMmax_dapi_SegObjt_Entry"] = infoList_dic["labels"]["DAPI"]["segmentedObjects"]["area_max"]
+    dic["aeraMin_dapi_SegObjt_Entry"] = infoList_dic["labels"]["DAPI"]["segmentedObjects"]["area_min"]
+    dic["zProject_Dapi_zmax_Entry"] = infoList_dic["labels"]["DAPI"]["zProject"]["zmax"]
+    dic["zProject_Dapi_zmin_Entry"] = infoList_dic["labels"]["DAPI"]["zProject"]["zmin"]
+    dic["zProject_Bcd_zmax_Entry"] = infoList_dic["labels"]["barcode"]["zProject"]["zmax"]
+    dic["zProject_Bcd_zmin_Entry"] = infoList_dic["labels"]["barcode"]["zProject"]["zmin"]
+    dic["zProject_Mask_zmax_Entry"] = infoList_dic["labels"]["mask"]["zProject"]["zmax"]
+    dic["zProject_Mask_zmin_Entry"] = infoList_dic["labels"]["mask"]["zProject"]["zmin"]
+    return dic
 
 
 def is_integer(num):
@@ -69,8 +134,12 @@ def check_dict(string: str):
         return False
 
 
-def update_infoList(user_values_dic):
-    dic_comm_acqui ={
+def update_infoList(user_values_dic, infolist_dic):
+    """"
+    1-Save old parameters from infolist_dic in infoList_preVersion.json in current directory.
+    2-Save new parameters from user_values_dic in infoList.json in current directory.
+    """
+    dic_comm_acqui = {
         "DAPI_channel": user_values_dic['dapi_ch'],
         "RNA_channel": user_values_dic['rna_ch'],
         "barcode_channel": user_values_dic['barcode_ch'],
@@ -86,7 +155,7 @@ def update_infoList(user_values_dic):
         "referenceFiducial": user_values_dic['referenceFiducial_Entry']
     }
     dic_comm_buildmatrix = {
-        "tracing_method": user_values_dic['tracing_method_Entry'].replace(' ','').split(","),
+        "tracing_method": user_values_dic['tracing_method_Entry'].replace(' ', '').split(","),
         "mask_expansion": int(user_values_dic['mask_expansion_Entry']),
         "flux_min": int(user_values_dic['flux_min_Entry']),
         "flux_min_3D": int(user_values_dic['flux_min_3D_Entry']),
@@ -100,11 +169,9 @@ def update_infoList(user_values_dic):
         "brightest": check_brightest(user_values_dic['brightest_Entry'])
     }
     dic_labels_dapi_segmObj = {
-        "area_max": int(user_values_dic['aeraMax_dapi_SegOblt_Entry']),
-        "area_min": int(user_values_dic['aeraMin_dapi_SegOblt_Entry'])
+        "area_max": int(user_values_dic['aeraMax_dapi_SegObjt_Entry']),
+        "area_min": int(user_values_dic['aeraMin_dapi_SegObjt_Entry'])
     }
-    
-   
     dic_labels_dapi_zpro = {
         "zmax": int(user_values_dic['zProject_Dapi_zmax_Entry']),
         "zmin": int(user_values_dic['zProject_Dapi_zmin_Entry'])
@@ -113,83 +180,31 @@ def update_infoList(user_values_dic):
         "zmax": int(user_values_dic['zProject_Bcd_zmax_Entry']),
         "zmin": int(user_values_dic['zProject_Bcd_zmin_Entry'])
     }
-    
     dic_labels_mask_zpro = {
-         "zmax": int(user_values_dic['zProject_Mask_zmax_Entry']),
-         "zmin": int(user_values_dic['zProject_Mask_zmin_Entry'])
-     }
-    with open("./infoList.json", mode='r') as file:
-        infoList = json.load(file)
-    infoList["common"]["acquisition"].update(dic_comm_acqui)
-    infoList["common"]["alignImages"].update(dic_comm_aligimg)
-    infoList["common"]["buildsPWDmatrix"].update(dic_comm_buildmatrix)
-    infoList["common"]["segmentedObjects"].update(dic_comm_segmObj)
-    infoList["labels"]["DAPI"]["segmentedObjects"].update(dic_labels_dapi_segmObj)
-    infoList["labels"]["DAPI"]["zProject"].update(dic_labels_dapi_zpro)
-    infoList["labels"]["barcode"]["zProject"].update(dic_labels_bcd_zpro)
-    infoList["labels"]["mask"]["zProject"].update(dic_labels_mask_zpro)
-    with open("./infoList_user.json", mode='w') as file:
-        json.dump(infoList, file, indent=4)
+        "zmax": int(user_values_dic['zProject_Mask_zmax_Entry']),
+        "zmin": int(user_values_dic['zProject_Mask_zmin_Entry'])
+    }
+    # Save previous parameters contained in infolist_dic in infoList_preVersion.json file
+    # in the current directory.
+    current_dir = os.getcwd()
+    infolist_previous_path = current_dir + os.sep + "infoList_preVersion.json"
+    with open(infolist_previous_path, mode='w') as file:
+        json.dump(infolist_dic, file, indent=4)
 
-# def create_user_parameters_dic(user_values_dic):
-#     user_parameters_dic= {
-#             "common": {
-#                 "acquisition": {
-#                     "DAPI_channel": user_values_dic['dapi_ch'],
-#                     "RNA_channel": user_values_dic['rna_ch'],
-#                     "barcode_channel": user_values_dic['barcode_ch'],
-#                     "mask_channel": user_values_dic['mask_ch'],
-#                     "fiducialBarcode_channel": user_values_dic['barcodeFid_ch'],
-#                     "fiducialMask_channel": user_values_dic['maskFid_ch'],
-#                     "fiducialDAPI_channel": user_values_dic['dapiFid_ch'],
-#                     "pixelSizeXY": float(user_values_dic['pixelSizeXY_Entry']),
-#                     "pixelSizeZ": float(user_values_dic['pixelSizeZ_Entry'])
-#                 },
-#                 "alignImages": {
-#                     "blockSize": int(user_values_dic['blockSize_Entry']),
-#                     "referenceFiducial": user_values_dic['referenceFiducial_Entry']
-#                 },
-#                 "buildsPWDmatrix": {
-#                     "tracing_method": user_values_dic['tracing_method_Entry'].replace(' ','').split(","),
-#                     "mask_expansion": int(user_values_dic['mask_expansion_Entry']),
-#                     "flux_min": int(user_values_dic['flux_min_Entry']),
-#                     "flux_min_3D": int(user_values_dic['flux_min_3D_Entry']),
-#                     "KDtree_distance_threshold_mum": int(user_values_dic['KDtree_distance_threshold_mum_Entry']),
-#                     "folder": str(user_values_dic['folder_Entry']),
-#                     "masks2process": convert_string_to_dictionnary(user_values_dic['masks2process_Entry']),
-#                     "toleranceDrift": int(user_values_dic['toleranceDrift_Entry'])
-#                 },
-#                 "segmentedObjects": {
-#                     "stardist_basename": str(user_values_dic['stardist_Entry']),
-#                     "brightest": check_brightest(user_values_dic['brightest_Entry'])
-#                 }
-#             },
-#             "labels": {
-#                 "DAPI": {
-#                     "segmentedObjects": {
-#                         "area_max": int(user_values_dic['aeraMax_dapi_SegOblt_Entry']),
-#                         "area_min": int(user_values_dic['aeraMin_dapi_SegOblt_Entry'])
-#                     },
-#                     "zProject": {
-#                         "zmax": int(user_values_dic['zProject_Dapi_zmax_Entry']),
-#                         "zmin": int(user_values_dic['zProject_Dapi_zmin_Entry'])
-#                     }
-#                 },
-#                 "barcode": {
-#                     "zProject": {
-#                         "zmax": int(user_values_dic['zProject_Bcd_zmax_Entry']),
-#                         "zmin": int(user_values_dic['zProject_Bcd_zmin_Entry'])
-#                     }
-#                 },
-#                 "mask": {
-#                     "zProject": {
-#                         "zmax": int(user_values_dic['zProject_Mask_zmax_Entry']),
-#                         "zmin": int(user_values_dic['zProject_Mask_zmin_Entry'])
-#                     }
-#                 }
-#             }
-#         }
-#     return user_parameters_dic
+    # Update infolist_dic with user_values_dic and save new infoList.json
+    infolist_dic["common"]["acquisition"].update(dic_comm_acqui)
+    infolist_dic["common"]["alignImages"].update(dic_comm_aligimg)
+    infolist_dic["common"]["buildsPWDmatrix"].update(dic_comm_buildmatrix)
+    infolist_dic["common"]["segmentedObjects"].update(dic_comm_segmObj)
+    infolist_dic["labels"]["DAPI"]["segmentedObjects"].update(dic_labels_dapi_segmObj)
+    infolist_dic["labels"]["DAPI"]["zProject"].update(dic_labels_dapi_zpro)
+    infolist_dic["labels"]["barcode"]["zProject"].update(dic_labels_bcd_zpro)
+    infolist_dic["labels"]["mask"]["zProject"].update(dic_labels_mask_zpro)
+
+    infolist_new_path = current_dir + os.sep + "infoList.json"
+    with open(infolist_new_path, mode='w') as file:
+        json.dump(infolist_dic, file, indent=4)
+
 
 def check_settings(entries_dic):
     """Return True if all parameters have good type expected, else return False with a pop-up error window"""

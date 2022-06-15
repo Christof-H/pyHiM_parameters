@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import tkinter as tk
 from tkinter import ttk
 from tkinter import END
@@ -5,15 +7,23 @@ from functools import partial
 from info_parameters import *
 from function_parameters import *
 from tkinter import messagebox
-import os
-import json
 
+# initialised when entries are created, dictionary that store the class entry for the parameter,
+# the value and the type of the value
 entries_dic = {}
+
+# dictionary that stores the user parameters entered in the entries
 user_values_dic = {}
+
 
 main_window = tk.Tk()
 main_window.title("pyHiM parameters")
 main_window.minsize(width=1000, height=480)
+# ------------------------------------------Tests------------------------------------------------------
+# recherche des dossiers installation de pyHiM ???? et quand Mac/windows ou sur serveur ??????????????????
+for folder in os.environ['PATH'].split(os.pathsep):
+    print('PATH :', folder)
+print(os.getcwd())
 
 # ---------------------------------------------Functions------------------------------------------------
 
@@ -23,7 +33,7 @@ def display_help(param):
     help_label.config(text=message)
 
 
-def restoreSetting():
+def restore_setting():
     dapi_ch.set(default_Entry_dic["dapi_ch"])
     dapiFid_ch.set(default_Entry_dic["dapiFid_ch"])
     barcode_ch.set(default_Entry_dic["barcode_ch"])
@@ -31,33 +41,31 @@ def restoreSetting():
     mask_ch.set(default_Entry_dic["mask_ch"])
     maskFid_ch.set(default_Entry_dic["maskFid_ch"])
     rna_ch.set(default_Entry_dic["rna_ch"])
-    #rnaFid_ch.set(default_Entry_dic["rnaFid_ch"])
+    # rnaFid_ch.set(default_Entry_dic["rnaFid_ch"])
     for key, list_values in entries_dic.items():
         if list_values[0].get() != "ch00" and list_values[0].get() != "ch01":
             list_values[0].delete(first=0, last=END)
-            list_values[0].insert(0, string=list_values[1])
+            list_values[0].insert(0, string=default_Entry_dic[key])
+            # list_values[0].insert(0, string=list_values[1])
 
 
 def save_setting(entries_dic, user_values_dic):
     if check_settings(entries_dic):
-        # Save getted values in Json file:
+        # update user values in entries_dic:
         for key, list_values in entries_dic.items():
             entered_value = list_values[0].get()
             user_values_dic[key] = entered_value
         update_infoList(user_values_dic)
-        # user_parameters_dic = create_user_parameters_dic(user_values_dic)
-        # with open("./infoList.json", mode='r') as file:
-        #     infoList = json.load(file)
-        #     infoList.update(user_parameters_dic)
-        # with open("./infoList_user.json", mode='w') as file:
-        #     json.dump(infoList, file, indent=4)
         messagebox.showinfo("Info Message", "The settings have been saved.")
 
 
-# ----------------Save and restaure button----------------------------
+# --------------------------------import values parameters from a infoList.json-----------------------------------------
+infolist_dic = import_parameters()
+
+# -----------------------------------------Save and restore button------------------------------------------------------
 
 # Restore button
-restore_button = tk.Button(main_window, text='Restore default settings', command=restoreSetting)
+restore_button = tk.Button(main_window, text='Restore default settings', command=restore_setting)
 restore_button.grid(row=27, column=0, columnspan=3, pady=5, padx=5)
 
 # Save button
@@ -77,7 +85,6 @@ tab2.grid(row=0, column=0, rowspan=10, columnspan=5)
 
 notebook.add(tab1, text='Standard Settings')
 notebook.add(tab2, text='Expert Settings')
-
 
 
 # -------------------------Label Frame--------------------------------
@@ -132,7 +139,8 @@ dapi_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial
 dapi_ch_HelpButton.grid(row=0, column=0)
 
 # Dapi Fiducial Channel Help Button (tab1):
-dapiFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "fiducialDAPI_channel"))
+dapiFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?",
+                                  command=partial(display_help, "fiducialDAPI_channel"))
 dapiFid_ch_HelpButton.grid(row=0, column=3)
 
 # Barcode Channel Help Button (tab1):
@@ -140,15 +148,18 @@ barcode_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=part
 barcode_ch_HelpButton.grid(row=3, column=0)
 
 # Barcode Fiducial Channel Help Button (tab1):
-barcodeFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "fiducialBarcode_channel"))
+barcodeFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?",
+                                     command=partial(display_help, "fiducialBarcode_channel"))
 barcodeFid_ch_HelpButton.grid(row=3, column=3)
 
 # Mask Channel Help Button (tab1):
-mask_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "mask_channel"))
+mask_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?",
+                               command=partial(display_help, "mask_channel"))
 mask_ch_HelpButton.grid(row=5, column=0)
 
 # Barcode Fiducial Channel Help Button (tab1):
-maskFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "fiducialMask_channel"))
+maskFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?",
+                                  command=partial(display_help, "fiducialMask_channel"))
 maskFid_ch_HelpButton.grid(row=5, column=3)
 
 # RNA Channel Help Button (tab1):
@@ -156,7 +167,8 @@ rna_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(
 rna_ch_HelpButton.grid(row=7, column=0)
 
 # # RNA Fiducial Channel Help Button (tab1):
-# rnaFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=partial(display_help, "fiducialRNA_channel"))
+# rnaFid_ch_HelpButton = tk.Button(acquisition_labelFrame, text="?",
+# command=partial(display_help, "fiducialRNA_channel"))
 # rnaFid_ch_HelpButton.grid(row=6, column=3)
 
 # pixelSizeXY Help Button (tab1):
@@ -168,7 +180,8 @@ pixelSizeZ_HelpButton = tk.Button(acquisition_labelFrame, text="?", command=part
 pixelSizeZ_HelpButton.grid(row=10, column=3)
 
 # ReferenceFiducial Help Button (tab1):
-referenceFiducial_HelpButton = tk.Button(alignImages_LabelFrame, text="?", command=partial(display_help, "referenceFiducial"))
+referenceFiducial_HelpButton = tk.Button(alignImages_LabelFrame, text="?",
+                                         command=partial(display_help, "referenceFiducial"))
 referenceFiducial_HelpButton.grid(row=12, column=0)
 
 # BlockSize Help Button (tab2):
@@ -179,16 +192,18 @@ blockSize_HelpButton.grid(row=0, column=0)
 flux_min_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "flux_min"))
 flux_min_HelpButton.grid(row=1, column=0)
 
-#flux_min_3D Help Button (tab2):
+# flux_min_3D Help Button (tab2):
 flux_min_3D_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "flux_min_3D"))
 flux_min_3D_HelpButton.grid(row=1, column=3)
 
 # toleranceDrift Help Button (tab2):
-toleranceDrift_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "toleranceDrift"))
+toleranceDrift_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?",
+                                      command=partial(display_help, "toleranceDrift"))
 toleranceDrift_HelpButton.grid(row=2, column=0)
 
 # mask_expansion Help Button (tab2):
-mask_expansion_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "mask_expansion"))
+mask_expansion_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?",
+                                      command=partial(display_help, "mask_expansion"))
 mask_expansion_HelpButton.grid(row=2, column=3)
 
 # folder Help Button (tab2):
@@ -196,19 +211,23 @@ mask_expansion_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", comm
 mask_expansion_HelpButton.grid(row=3, column=0)
 
 # masks2process Help Button (tab2):
-masks2process_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "masks2process"))
+masks2process_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?",
+                                     command=partial(display_help, "masks2process"))
 masks2process_HelpButton.grid(row=4, column=0)
 
 # tracing_method Help Button (tab2):
-tracing_method_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "tracing_method"))
+tracing_method_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?",
+                                      command=partial(display_help, "tracing_method"))
 tracing_method_HelpButton.grid(row=5, column=0)
 
 # KDtree_distance_threshold_mum Help Button (tab2):
-tracing_method_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?", command=partial(display_help, "KDtree_distance_threshold_mum"))
+tracing_method_HelpButton = tk.Button(buildsPWDmatrix_LabelFrame, text="?",
+                                      command=partial(display_help, "KDtree_distance_threshold_mum"))
 tracing_method_HelpButton.grid(row=6, column=0)
 
 # stardist_basename Help Button (tab2):
-stardist_HelpButton = tk.Button(segmentedObjects_LabelFrame, text="?", command=partial(display_help, "Stardist_basename"))
+stardist_HelpButton = tk.Button(segmentedObjects_LabelFrame, text="?",
+                                command=partial(display_help, "Stardist_basename"))
 stardist_HelpButton.grid(row=7, column=0)
 
 # brightest Help Button (tab2):
@@ -216,10 +235,12 @@ brightest_HelpButton = tk.Button(segmentedObjects_LabelFrame, text="?", command=
 brightest_HelpButton.grid(row=8, column=0)
 
 # segmentObject_Labels_aeramax Help Button (tab2):
-segmentObject_Labels_aeraMax_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "segmentObject_Labels_dapi_aeraMax"))
+segmentObject_Labels_aeraMax_HelpButton = tk.Button(labels_LabelFrame, text="?",
+                                                    command=partial(display_help, "segmentObject_Labels_dapi_aeraMax"))
 segmentObject_Labels_aeraMax_HelpButton.grid(row=10, column=0)
 # segmentObject_Labels_aeramin Help Button (tab2):
-segmentObject_Labels_aeraMin_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "segmentObject_Labels_dapi_aeraMin"))
+segmentObject_Labels_aeraMin_HelpButton = tk.Button(labels_LabelFrame, text="?",
+                                                    command=partial(display_help, "segmentObject_Labels_dapi_aeraMin"))
 segmentObject_Labels_aeraMin_HelpButton.grid(row=11, column=0)
 
 # ZProject_dapi_zmax Help Button (tab2):
@@ -230,17 +251,21 @@ zProject_zmin_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partia
 zProject_zmin_HelpButton.grid(row=11, column=4)
 
 # ZProject_Bcd_zmax Help Button (tab2):
-zProject_Bcd_zmax_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "zProject_Bcd_zmax"))
+zProject_Bcd_zmax_HelpButton = tk.Button(labels_LabelFrame, text="?",
+                                         command=partial(display_help, "zProject_Bcd_zmax"))
 zProject_Bcd_zmax_HelpButton.grid(row=13, column=0)
 # ZProject_Bcd_zmin Help Button (tab2):
-zProject_Bcd_zmin_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "zProject_Bcd_zmin"))
+zProject_Bcd_zmin_HelpButton = tk.Button(labels_LabelFrame, text="?",
+                                         command=partial(display_help, "zProject_Bcd_zmin"))
 zProject_Bcd_zmin_HelpButton.grid(row=14, column=0)
 
 # ZProject_Mask_zmax Help Button (tab2):
-zProject_Mask_zmax_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "zProject_Mask_zmax"))
+zProject_Mask_zmax_HelpButton = tk.Button(labels_LabelFrame, text="?",
+                                          command=partial(display_help, "zProject_Mask_zmax"))
 zProject_Mask_zmax_HelpButton.grid(row=13, column=4)
 # ZProject_Mask_zmin Help Button (tab2):
-zProject_Mask_zmin_HelpButton = tk.Button(labels_LabelFrame, text="?", command=partial(display_help, "zProject_Mask_zmin"))
+zProject_Mask_zmin_HelpButton = tk.Button(labels_LabelFrame, text="?",
+                                          command=partial(display_help, "zProject_Mask_zmin"))
 zProject_Mask_zmin_HelpButton.grid(row=14, column=4)
 
 
@@ -281,14 +306,14 @@ pixelSizeZ_label.grid(row=10, column=4)
 # --------------------------Entry for acquisition_labelFrame---------------------
 # pixelSizeXY Entry
 pixelSizeXY_Entry = tk.Entry(acquisition_labelFrame)
-value = default_Entry_dic["pixelSizeXY_Entry"]
+value = infolist_dic["pixelSizeXY_Entry"]
 pixelSizeXY_Entry.insert(0, string=value)
 entries_dic["pixelSizeXY_Entry"] = [pixelSizeXY_Entry, value, type(value)]
 pixelSizeXY_Entry.grid(row=10, column=2)
 
 # pixelSizeZ Entry
 pixelSizeZ_Entry = tk.Entry(acquisition_labelFrame)
-value = default_Entry_dic["pixelSizeZ_Entry"]
+value = infolist_dic["pixelSizeZ_Entry"]
 pixelSizeZ_Entry.insert(0, string=value)
 entries_dic["pixelSizeZ_Entry"] = [pixelSizeZ_Entry, value, type(value)]
 pixelSizeZ_Entry.grid(row=10, column=5)
@@ -296,7 +321,7 @@ pixelSizeZ_Entry.grid(row=10, column=5)
 # --------------------------Radiobutton of different channels for acquisition_labelFrame---------------------
 # Dapi Channel Radiobutton:
 dapi_ch = tk.StringVar()
-value = default_Entry_dic["dapi_ch"]
+value = infolist_dic["dapi_ch"]
 dapi_ch.set(value)
 entries_dic["dapi_ch"] = [dapi_ch, value, type(value)]
 dapi_ch_Radiobutton1 = tk.Radiobutton(acquisition_labelFrame, text="Ch00", value="ch00", variable=dapi_ch)
@@ -308,7 +333,7 @@ dapi_ch_Radiobutton3.grid(row=2, column=2)
 
 # Dapi Fiducial Channel Radiobutton:
 dapiFid_ch = tk.StringVar()
-value = default_Entry_dic["dapiFid_ch"]
+value = infolist_dic["dapiFid_ch"]
 dapiFid_ch.set(value)
 entries_dic["dapiFid_ch"] = [dapiFid_ch, value, type(value)]
 dapiFid_ch_Radiobutton1 = tk.Radiobutton(acquisition_labelFrame, text="Ch00", value="ch00", variable=dapiFid_ch)
@@ -320,7 +345,7 @@ dapiFid_ch_Radiobutton3.grid(row=2, column=5)
 
 # Barcode Channel Radiobutton:
 barcode_ch = tk.StringVar()
-value = default_Entry_dic["barcode_ch"]
+value = infolist_dic["barcode_ch"]
 barcode_ch.set(value)
 entries_dic["barcode_ch"] = [barcode_ch, value, type(value)]
 barcode_ch_Radiobutton1 = tk.Radiobutton(acquisition_labelFrame, text="Ch00", value="ch00", variable=barcode_ch)
@@ -330,7 +355,7 @@ barcode_ch_Radiobutton2.grid(row=4, column=2)
 
 # Barcode Fiducial Channel Radiobutton:
 barcodeFid_ch = tk.StringVar()
-value = default_Entry_dic["barcodeFid_ch"]
+value = infolist_dic["barcodeFid_ch"]
 barcodeFid_ch.set(value)
 entries_dic["barcodeFid_ch"] = [barcodeFid_ch, value, type(value)]
 barcodeFid_ch_Radiobutton1 = tk.Radiobutton(acquisition_labelFrame, text="Ch00", value="ch00", variable=barcodeFid_ch)
@@ -340,7 +365,7 @@ barcodeFid_ch_Radiobutton2.grid(row=4, column=5)
 
 # Mask Channel Radiobutton:
 mask_ch = tk.StringVar()
-value = default_Entry_dic["mask_ch"]
+value = infolist_dic["mask_ch"]
 mask_ch.set(value)
 entries_dic["mask_ch"] = [mask_ch, value, type(value)]
 mask_ch_Radiobutton1 = tk.Radiobutton(acquisition_labelFrame, text="Ch00", value="ch00", variable=mask_ch)
@@ -350,7 +375,7 @@ mask_ch_Radiobutton2.grid(row=6, column=2)
 
 # # Barcode Fiducial Channel Radiobutton:
 maskFid_ch = tk.StringVar()
-value = default_Entry_dic["maskFid_ch"]
+value = infolist_dic["maskFid_ch"]
 maskFid_ch.set(value)
 entries_dic["maskFid_ch"] = [maskFid_ch, value, type(value)]
 maskFid_ch_Radiobutton1 = tk.Radiobutton(acquisition_labelFrame, text="Ch00", value="ch00", variable=maskFid_ch)
@@ -361,26 +386,25 @@ maskFid_ch_Radiobutton2.grid(row=6, column=5)
 # # RNA Channel Radiobutton:
 # rna_ch_Radiobutton
 rna_ch = tk.StringVar()
-value = default_Entry_dic["rna_ch"]
+value = infolist_dic["rna_ch"]
 rna_ch.set(value)
 entries_dic["rna_ch"] = [rna_ch, value, type(value)]
 rna_ch_Radiobutton1 = tk.Radiobutton(acquisition_labelFrame, text="Ch00", value="ch00", variable=rna_ch)
 rna_ch_Radiobutton1.grid(row=7, column=2)
 rna_ch_Radiobutton2 = tk.Radiobutton(acquisition_labelFrame, text="Ch01", value="ch01", variable=rna_ch)
 rna_ch_Radiobutton2.grid(row=8, column=2)
-rna_ch_Radiobutton3 = tk.Radiobutton(acquisition_labelFrame, text="Ch01", value="ch02", variable=rna_ch)
+rna_ch_Radiobutton3 = tk.Radiobutton(acquisition_labelFrame, text="Ch02", value="ch02", variable=rna_ch)
 rna_ch_Radiobutton3.grid(row=9, column=2)
 
 # RNA Fiducial Channel Radiobutton:
 # rnaFid_ch = tk.StringVar()
-# value = default_Entry_dic["rnaFid_ch"]
+# value = infolist_dic["rnaFid_ch"]
 # rnaFid_ch.set(value)
 # entries_dic["rnaFid_ch"] = [rnaFid_ch, value, type(value)]
 # rnaFid_ch_Radiobutton1 = tk.Radiobutton(acquisition_labelFrame, text="Ch00", value="ch00", variable=rnaFid_ch)
 # rnaFid_ch_Radiobutton1.grid(row=6, column=5)
 # rnaFid_ch_Radiobutton2 = tk.Radiobutton(acquisition_labelFrame, text="Ch01", value="ch01", variable=rnaFid_ch)
 # rnaFid_ch_Radiobutton2.grid(row=7, column=5)
-
 
 
 # --------------------------------alignImages parameters Reference fiducial (tab1)-------------------------------
@@ -391,9 +415,9 @@ referenceFiducial_label.grid(row=12, column=1)
 
 # ReferenceFiducial Entry
 referenceFiducial_Entry = tk.Entry(alignImages_LabelFrame)
-value = default_Entry_dic["referenceFiducial_Entry"]
+value = infolist_dic["referenceFiducial_Entry"]
 referenceFiducial_Entry.insert(0, string=value)
-entries_dic["referenceFiducial_Entry"]=[referenceFiducial_Entry, value, type(value)]
+entries_dic["referenceFiducial_Entry"] = [referenceFiducial_Entry, value, type(value)]
 referenceFiducial_Entry.grid(row=12, column=2, pady=15)
 
 # --------------------------------alignImages parameters Block Size (tab2)-------------------------------
@@ -404,9 +428,9 @@ blockSize_label.grid(row=0, column=1)
 
 # BlockSize Entry
 blockSize_Entry = tk.Entry(alignImages_LabelFrame2)
-value = default_Entry_dic["blockSize_Entry"]
+value = infolist_dic["blockSize_Entry"]
 blockSize_Entry.insert(0, string=value)
-entries_dic["blockSize_Entry"]=[blockSize_Entry, value, type(value)]
+entries_dic["blockSize_Entry"] = [blockSize_Entry, value, type(value)]
 blockSize_Entry.grid(row=0, column=2, pady=15)
 
 # -----------------------------buildsPWDmatrix parameters tab2)-------------------------------
@@ -445,21 +469,21 @@ KDtree_distance_threshold_mum_label.grid(row=6, column=1)
 
 # flux_min Entry
 flux_min_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
-value = default_Entry_dic["flux_min_Entry"]
+value = infolist_dic["flux_min_Entry"]
 flux_min_Entry.insert(0, string=value)
 entries_dic["flux_min_Entry"] = [flux_min_Entry, value, type(value)]
 flux_min_Entry.grid(row=1, column=2)
 
 # flux_min_3D Entry
 flux_min_3D_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=10)
-value = default_Entry_dic["flux_min_3D_Entry"]
+value = infolist_dic["flux_min_3D_Entry"]
 flux_min_3D_Entry.insert(0, string=value)
 entries_dic["flux_min_3D_Entry"] = [flux_min_3D_Entry, value, type(value)]
 flux_min_3D_Entry.grid(row=1, column=5)
 
 # toleranceDrift Entry
 toleranceDrift_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
-value = default_Entry_dic["toleranceDrift_Entry"]
+value = infolist_dic["toleranceDrift_Entry"]
 toleranceDrift_Entry.insert(0, string=value)
 entries_dic["toleranceDrift_Entry"] = [toleranceDrift_Entry, value, type(value)]
 toleranceDrift_Entry.grid(row=2, column=2)
@@ -467,35 +491,35 @@ toleranceDrift_Entry.grid(row=2, column=2)
 
 # mask_expansion Entry
 mask_expansion_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=10)
-value = default_Entry_dic["mask_expansion_Entry"]
+value = infolist_dic["mask_expansion_Entry"]
 mask_expansion_Entry.insert(0, string=value)
 entries_dic["mask_expansion_Entry"] = [mask_expansion_Entry, value, type(value)]
 mask_expansion_Entry.grid(row=2, column=5)
 
 # folder Entry
 folder_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
-value = default_Entry_dic["folder_Entry"]
+value = infolist_dic["folder_Entry"]
 folder_Entry.insert(0, string=value)
 entries_dic["folder_Entry"] = [folder_Entry, value, type(value)]
 folder_Entry.grid(row=3, column=2)
 
 # masks2process Entry
 masks2process_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
-value = default_Entry_dic["masks2process_Entry"]
+value = infolist_dic["masks2process_Entry"]
 masks2process_Entry.insert(0, string=value)
 entries_dic["masks2process_Entry"] = [masks2process_Entry, value, type(value)]
 masks2process_Entry.grid(row=4, column=2)
 
 # tracing_method Entry
 tracing_method_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
-value = default_Entry_dic["tracing_method_Entry"]
+value = infolist_dic["tracing_method_Entry"]
 tracing_method_Entry.insert(0, string=value)
 entries_dic["tracing_method_Entry"] = [tracing_method_Entry, value, type(value)]
 tracing_method_Entry.grid(row=5, column=2)
 
 # KDtree_distance_threshold_mum Entry
 KDtree_distance_threshold_mum_Entry = tk.Entry(buildsPWDmatrix_LabelFrame, width=25)
-value = default_Entry_dic["KDtree_distance_threshold_mum_Entry"]
+value = infolist_dic["KDtree_distance_threshold_mum_Entry"]
 KDtree_distance_threshold_mum_Entry.insert(0, string=value)
 entries_dic["KDtree_distance_threshold_mum_Entry"] = [KDtree_distance_threshold_mum_Entry, value, type(value)]
 KDtree_distance_threshold_mum_Entry.grid(row=6, column=2)
@@ -511,14 +535,14 @@ brightest_label.grid(row=8, column=1)
 
 # stardist_basename Entry
 stardist_Entry = tk.Entry(segmentedObjects_LabelFrame, width=65)
-value = default_Entry_dic["stardist_Entry"]
+value = infolist_dic["stardist_Entry"]
 stardist_Entry.insert(0, string=value)
 entries_dic["stardist_Entry"] = [stardist_Entry, value, type(value)]
 stardist_Entry.grid(row=7, column=2)
 
 # brightest Entry
 brightest_Entry = tk.Entry(segmentedObjects_LabelFrame, width=25)
-value = default_Entry_dic["brightest_Entry"]
+value = infolist_dic["brightest_Entry"]
 brightest_Entry.insert(0, string=value)
 entries_dic["brightest_Entry"] = [brightest_Entry, value, type(value)]
 brightest_Entry.grid(row=8, column=2)
@@ -530,11 +554,11 @@ brightest_Entry.grid(row=8, column=2)
 segmentedObjects_label = tk.Label(labels_LabelFrame, text="Dapi_SegmentedObjects :")
 segmentedObjects_label.grid(row=9, column=0)
 #       Aera_max Label
-aeraMaxSegOblt_label = tk.Label(labels_LabelFrame, text="Aera_max :")
-aeraMaxSegOblt_label.grid(row=10, column=1)
+aeraMaxSegObjt_label = tk.Label(labels_LabelFrame, text="Aera_max :")
+aeraMaxSegObjt_label.grid(row=10, column=1)
 #       Aera_min Label
-aeraMinSegOblt_label = tk.Label(labels_LabelFrame, text="Aera_min :")
-aeraMinSegOblt_label.grid(row=11, column=1)
+aeraMinSegObjt_label = tk.Label(labels_LabelFrame, text="Aera_min :")
+aeraMinSegObjt_label.grid(row=11, column=1)
 
 # zProject for Dapi Label
 zProjectDapi_label = tk.Label(labels_LabelFrame, text="zProject for Dapi :")
@@ -567,28 +591,28 @@ zminZProjct_Mask_label = tk.Label(labels_LabelFrame, text="zmin :")
 zminZProjct_Mask_label.grid(row=14, column=5)
 
 # segmentedObjects Aera_max Entry
-aeraMmax_dapi_SegOblt_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["aeraMmax_dapi_SegOblt_Entry"]
-aeraMmax_dapi_SegOblt_Entry.insert(0, string=value)
-entries_dic["aeraMax_dapi_SegOblt_Entry"] = [aeraMmax_dapi_SegOblt_Entry, value, type(value)]
-aeraMmax_dapi_SegOblt_Entry.grid(row=10, column=2)
+aeraMmax_dapi_SegObjt_Entry = tk.Entry(labels_LabelFrame, width=10)
+value = infolist_dic["aeraMmax_dapi_SegObjt_Entry"]
+aeraMmax_dapi_SegObjt_Entry.insert(0, string=value)
+entries_dic["aeraMax_dapi_SegObjt_Entry"] = [aeraMmax_dapi_SegObjt_Entry, value, type(value)]
+aeraMmax_dapi_SegObjt_Entry.grid(row=10, column=2)
 # segmentedObjects Aera_min Entry
-aeraMin_dapi_SegOblt_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["aeraMin_dapi_SegOblt_Entry"]
-aeraMin_dapi_SegOblt_Entry.insert(0, string=value)
-entries_dic["aeraMin_dapi_SegOblt_Entry"] = [aeraMin_dapi_SegOblt_Entry, value, type(value)]
-aeraMin_dapi_SegOblt_Entry.grid(row=11, column=2)
+aeraMin_dapi_SegObjt_Entry = tk.Entry(labels_LabelFrame, width=10)
+value = infolist_dic["aeraMin_dapi_SegObjt_Entry"]
+aeraMin_dapi_SegObjt_Entry.insert(0, string=value)
+entries_dic["aeraMin_dapi_SegObjt_Entry"] = [aeraMin_dapi_SegObjt_Entry, value, type(value)]
+aeraMin_dapi_SegObjt_Entry.grid(row=11, column=2)
 
 # zProject zmax Entry
 zProject_Dapi_zmax_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["zProject_Dapi_zmax_Entry"]
+value = infolist_dic["zProject_Dapi_zmax_Entry"]
 zProject_Dapi_zmax_Entry.insert(0, string=value)
 entries_dic["zProject_Dapi_zmax_Entry"] = [zProject_Dapi_zmax_Entry, value, type(value)]
 zProject_Dapi_zmax_Entry.grid(row=10, column=6)
 
 # zProject zmin Entry
 zProject_Dapi_zmin_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["zProject_Dapi_zmin_Entry"]
+value = infolist_dic["zProject_Dapi_zmin_Entry"]
 zProject_Dapi_zmin_Entry.insert(0, string=value)
 entries_dic["zProject_Dapi_zmin_Entry"] = [zProject_Dapi_zmin_Entry, value, type(value)]
 zProject_Dapi_zmin_Entry.grid(row=11, column=6)
@@ -596,60 +620,28 @@ zProject_Dapi_zmin_Entry.grid(row=11, column=6)
 
 # zProject barcode zmax Entry
 zProject_Bcd_zmax_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["zProject_Bcd_zmax_Entry"]
+value = infolist_dic["zProject_Bcd_zmax_Entry"]
 zProject_Bcd_zmax_Entry.insert(0, string=value)
 entries_dic["zProject_Bcd_zmax_Entry"] = [zProject_Bcd_zmax_Entry, value, type(value)]
 zProject_Bcd_zmax_Entry.grid(row=13, column=2)
 # zProject barcode zmin Entry
 zProject_Bcd_zmin_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["zProject_Bcd_zmin_Entry"]
+value = infolist_dic["zProject_Bcd_zmin_Entry"]
 zProject_Bcd_zmin_Entry.insert(0, string=value)
 entries_dic["zProject_Bcd_zmin_Entry"] = [zProject_Bcd_zmin_Entry, value, type(value)]
 zProject_Bcd_zmin_Entry.grid(row=14, column=2)
 
 # zProject mask zmax Entry
 zProject_Mask_zmax_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["zProject_Mask_zmax_Entry"]
+value = infolist_dic["zProject_Mask_zmax_Entry"]
 zProject_Mask_zmax_Entry.insert(0, string=value)
 entries_dic["zProject_Mask_zmax_Entry"] = [zProject_Mask_zmax_Entry, value, type(value)]
 zProject_Mask_zmax_Entry.grid(row=13, column=6)
 # zProject mask zmin Entry
 zProject_Mask_zmin_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = default_Entry_dic["zProject_Mask_zmin_Entry"]
+value = infolist_dic["zProject_Mask_zmin_Entry"]
 zProject_Mask_zmin_Entry.insert(0, string=value)
 entries_dic["zProject_Mask_zmin_Entry"] = [zProject_Mask_zmin_Entry, value, type(value)]
 zProject_Mask_zmin_Entry.grid(row=14, column=6)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 main_window.mainloop()
