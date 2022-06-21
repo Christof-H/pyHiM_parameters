@@ -36,6 +36,7 @@ def display_help(param):
 
 
 def restore_setting():
+    default_Entry_dic, _ =import_parameters(script_dir)
     dapi_ch.set(default_Entry_dic["dapi_ch"])
     dapiFid_ch.set(default_Entry_dic["dapiFid_ch"])
     barcode_ch.set(default_Entry_dic["barcode_ch"])
@@ -45,7 +46,7 @@ def restore_setting():
     rna_ch.set(default_Entry_dic["rna_ch"])
     # rnaFid_ch.set(default_Entry_dic["rnaFid_ch"])
     for key, list_values in entries_dic.items():
-        if list_values[0].get() != "ch00" and list_values[0].get() != "ch01":
+        if list_values[0].get() != "ch00" and list_values[0].get() != "ch01" and list_values[0].get() != "ch02":
             list_values[0].delete(first=0, last=END)
             list_values[0].insert(0, string=default_Entry_dic[key])
             # list_values[0].insert(0, string=list_values[1])
@@ -62,7 +63,7 @@ def save_setting(entries_dic, user_values_dic):
 
 
 # --------------------------------import values parameters from a infoList.json-----------------------------------------
-infolist_partial, infoList_full = import_parameters(current_dir,script_dir)
+infolist_partial, infoList_full = import_parameters(script_dir, current_dir)
 
 # -----------------------------------------Save and restore button------------------------------------------------------
 
@@ -581,11 +582,11 @@ zminZProjct_Mask_label = tk.Label(labels_LabelFrame, text="zmin :")
 zminZProjct_Mask_label.grid(row=14, column=4)
 
 # segmentedObjects Aera_max Entry
-aeraMmax_dapi_SegObjt_Entry = tk.Entry(labels_LabelFrame, width=10)
-value = infolist_partial["aeraMmax_dapi_SegObjt_Entry"]
-aeraMmax_dapi_SegObjt_Entry.insert(0, string=value)
-entries_dic["aeraMax_dapi_SegObjt_Entry"] = [aeraMmax_dapi_SegObjt_Entry, value, type(value)]
-aeraMmax_dapi_SegObjt_Entry.grid(row=10, column=1)
+aeraMax_dapi_SegObjt_Entry = tk.Entry(labels_LabelFrame, width=10)
+value = infolist_partial["aeraMax_dapi_SegObjt_Entry"]
+aeraMax_dapi_SegObjt_Entry.insert(0, string=value)
+entries_dic["aeraMax_dapi_SegObjt_Entry"] = [aeraMax_dapi_SegObjt_Entry, value, type(value)]
+aeraMax_dapi_SegObjt_Entry.grid(row=10, column=1)
 # segmentedObjects Aera_min Entry
 aeraMin_dapi_SegObjt_Entry = tk.Entry(labels_LabelFrame, width=10)
 value = infolist_partial["aeraMin_dapi_SegObjt_Entry"]

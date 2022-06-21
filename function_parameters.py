@@ -17,17 +17,22 @@ def convert_list_to_string(liste: list):
     return string
 
 
-def import_parameters(currentDir, scriptDir):
-    """Function that imports by default the parameters from the infoList.json
-    located in the current directory. If there is no infoList in the current
-    directory, the parameters are imported from the infoList.json located in
-    the script directory. Return the parameters are stored in a dictionary
+def import_parameters(scriptDir, currentDir=None):
+    """Function that imports the parameters from the infoList.json
+    located in the script directory. If there is a current directory parameter
+    the parameters are imported from the infoList.json located in priority from
+    the current directory. Return the parameters are stored in a dictionary
     """
-    infolistCurrent_path = currentDir + os.sep + "infoList.json"
+
     infolistScript_path = scriptDir + os.sep + "infoList.json"
-    if os.path.exists(infolistCurrent_path):
-        with open(infolistCurrent_path, mode='r') as file:
-            dic_full = json.load(file)
+    if currentDir != None:
+        infolistCurrent_path = currentDir + os.sep + "infoList.json"
+        if os.path.exists(infolistCurrent_path):
+            with open(infolistCurrent_path, mode='r') as file:
+                dic_full = json.load(file)
+        else:
+            with open(infolistScript_path, mode='r') as file:
+                dic_full = json.load(file)
     else:
         with open(infolistScript_path, mode='r') as file:
             dic_full = json.load(file)
@@ -56,7 +61,7 @@ def import_parameters(currentDir, scriptDir):
         "KDtree_distance_threshold_mum"]
     dic["stardist_Entry"] = dic_full["common"]["segmentedObjects"]["stardist_basename"]
     dic["brightest_Entry"] = dic_full["common"]["segmentedObjects"]["brightest"]
-    dic["aeraMmax_dapi_SegObjt_Entry"] = dic_full["labels"]["DAPI"]["segmentedObjects"]["area_max"]
+    dic["aeraMax_dapi_SegObjt_Entry"] = dic_full["labels"]["DAPI"]["segmentedObjects"]["area_max"]
     dic["aeraMin_dapi_SegObjt_Entry"] = dic_full["labels"]["DAPI"]["segmentedObjects"]["area_min"]
     dic["zProject_Dapi_zmax_Entry"] = dic_full["labels"]["DAPI"]["zProject"]["zmax"]
     dic["zProject_Dapi_zmin_Entry"] = dic_full["labels"]["DAPI"]["zProject"]["zmin"]
